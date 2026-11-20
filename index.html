@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>הפינה שלי</title>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Varela+Round&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF4EA; --card:#FFFDF8; --ink:#4A3B32; --muted:#8C7A6B; --line:#EADBC8;
+  --terra:#C8745A; --terra-d:#B0603F; --sage:#8FA88A; --sage-l:#E4EDDF; --butter:#F6E3B4; --blush:#F6DAD0;
+  --shadow:0 6px 20px rgba(120,80,50,.09);
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#2B231E; --card:#362C26; --ink:#F3E8DA; --muted:#BBA894; --line:#4A3D34;
+    --terra:#E08E73; --terra-d:#D07C60; --sage:#9DB898; --sage-l:#3C4638; --butter:#5A4A2C; --blush:#5A3D36; --shadow:0 6px 20px rgba(0,0,0,.3); }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{
+  font-family:'Assistant',system-ui,sans-serif; color:var(--ink); line-height:1.5; font-size:16px;
+  background:
+    radial-gradient(420px 300px at 100% -40px, var(--blush), transparent 70%),
+    radial-gradient(380px 280px at 0% 120px, var(--butter), transparent 70%),
+    var(--bg);
+  background-repeat:no-repeat; min-height:100vh;
+}
+#app{max-width:520px;margin:0 auto;padding:20px 16px calc(100px + env(safe-area-inset-bottom))}
+h1,h2,h3{font-family:'Varela Round','Assistant',sans-serif;font-weight:400;margin:0}
+h1{font-size:28px;line-height:1.2}
+h2{font-size:21px;margin-bottom:4px}
+h3{font-size:17px;margin-bottom:6px}
+p{margin:4px 0}
+.sub{color:var(--muted);font-size:15px}
+.card{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:16px;margin:14px 0;border:1px solid var(--line)}
+.card.warm{background:linear-gradient(160deg,var(--butter),var(--blush));border:none}
+.card.sage{background:var(--sage-l);border:none}
+.card.today{border:2px solid var(--terra)}
+.row{display:flex;gap:8px;align-items:center}
+.row.wrap{flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+input[type=text],input[type=date],textarea{
+  width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);
+  border-radius:14px;padding:10px 12px;outline:none;resize:vertical;
+}
+textarea{min-height:90px}
+input:focus,textarea:focus{border-color:var(--terra)}
+::placeholder{color:var(--muted);opacity:.7}
+.btn{font:inherit;font-weight:600;border:none;border-radius:14px;padding:10px 16px;cursor:pointer;background:var(--terra);color:#fff;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.ghost{background:transparent;color:var(--terra);border:1.5px solid var(--terra)}
+.btn.soft{background:var(--sage-l);color:var(--ink)}
+.btn.small{padding:6px 12px;font-size:14px;border-radius:12px}
+.btn.icon{padding:10px 14px}
+.chip{font:inherit;font-size:14px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;margin:0 0 6px 6px}
+.chip.on{background:var(--sage-l);border-color:var(--sage)}
+.chip:active{transform:scale(.97)}
+.x{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:0 6px;line-height:1}
+.moods{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.mood{font:inherit;background:var(--bg);border:2px solid transparent;border-radius:16px;padding:8px 2px;cursor:pointer;text-align:center;font-size:12.5px;color:var(--ink)}
+.mood span{display:block;font-size:26px}
+.mood.on{border-color:var(--terra);background:var(--card)}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin:10px 0 4px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sage),var(--terra));border-radius:99px;transition:width .4s}
+.item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.item:last-child{border-bottom:none}
+.check{width:28px;height:28px;border-radius:50%;border:2px solid var(--sage);background:transparent;flex:none;cursor:pointer;color:var(--ink);font:inherit;font-size:14px;line-height:1;padding:0;display:grid;place-items:center}
+.check.on{background:var(--sage);color:#fff}
+.check.big{width:38px;height:38px;font-size:16px}
+.done-t{text-decoration:line-through;color:var(--muted)}
+.slot{font-family:'Varela Round',sans-serif;font-size:16px;margin:14px 0 2px;color:var(--terra-d)}
+.tabbar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:flex;justify-content:center;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:5}
+.tabbar-in{display:flex;max-width:520px;width:100%}
+.tab{flex:1;min-width:0;font:inherit;background:none;border:none;color:var(--muted);cursor:pointer;padding:4px 0;font-size:10.5px;border-radius:14px}
+.tab span{display:block;font-size:20px;filter:grayscale(.6);opacity:.8}
+.tab.on{color:var(--terra-d);font-weight:700}
+.tab.on span{filter:none;opacity:1}
+.hearts button{background:none;border:none;font-size:20px;cursor:pointer;padding:0 1px;opacity:.3}
+.hearts button.on{opacity:1}
+.tag{display:inline-block;font-size:12px;border-radius:99px;padding:1px 9px;background:var(--blush);margin-inline-start:6px;color:var(--ink)}
+.tag.t2{background:var(--sage-l)}
+.hint{font-size:14px;color:var(--muted);background:var(--bg);border-radius:12px;padding:8px 12px;margin:8px 0}
+.jsec{margin:16px 0 4px}
+.jin{margin:6px 0}
+.breath{display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0}
+.breath div{width:70px;height:70px;border-radius:50%;background:radial-gradient(circle,var(--sage),var(--sage-l));animation:br 10s ease-in-out infinite}
+@keyframes br{0%,100%{transform:scale(.7)}40%{transform:scale(1.35)}}
+.big{font-size:44px;text-align:center}
+.center{text-align:center}
+#toast{position:fixed;bottom:calc(84px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;opacity:0;transition:.3s;z-index:60;pointer-events:none;max-width:90%;text-align:center;font-size:15px}
+#toast.show{opacity:1;transform:translateX(-50%)}
+#letter{position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;padding:20px;overflow:auto;
+  background:radial-gradient(500px 400px at 80% 0, var(--blush), transparent 70%),radial-gradient(500px 400px at 10% 100%, var(--butter), transparent 70%),var(--bg)}
+#letter.show{display:flex;animation:fade .6s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.paper{max-width:420px;background:var(--card);border-radius:8px 24px 24px 24px;padding:26px 24px;box-shadow:0 14px 40px rgba(120,80,50,.18);border:1px solid var(--line);font-family:'Varela Round','Assistant',sans-serif;font-size:18px;line-height:1.75}
+.paper .sig{margin-top:14px;text-align:left;color:var(--terra-d)}
+details summary{cursor:pointer;color:var(--muted);font-size:15px}
+.j-hist{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px}
+.j-hist .chip{flex:none;margin:0}
+/* sheet */
+#sheet{position:fixed;inset:0;z-index:40;display:none;background:rgba(40,28,20,.45);align-items:flex-end;justify-content:center}
+#sheet.show{display:flex;animation:fade .25s}
+.sheet-in{background:var(--bg);width:100%;max-width:520px;max-height:90vh;overflow:auto;border-radius:26px 26px 0 0;padding:18px 16px calc(24px + env(safe-area-inset-bottom))}
+.mic{width:52px;height:52px;border-radius:50%;font-size:22px;padding:0}
+.mic.live{background:#d9534f;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(217,83,79,.5)}50%{box-shadow:0 0 0 12px rgba(217,83,79,0)}}
+/* week */
+.dayhead{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.dtag{font-size:13px;border-radius:99px;padding:2px 10px;border:none;cursor:default}
+.dtag.work{background:var(--butter);color:var(--ink)}
+.dtag.free{background:var(--sage-l);color:var(--ink)}
+.addrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.addrow .chip{margin:0;font-size:13px}
+/* workout game */
+.path{display:flex;align-items:center;gap:0;margin:10px 0 6px;overflow-x:auto;padding:6px 2px}
+.node{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:14px;background:var(--line);color:var(--muted);flex:none;font-weight:700}
+.node.done{background:var(--sage);color:#fff}
+.node.cur{background:var(--terra);color:#fff;box-shadow:0 0 0 5px rgba(200,116,90,.25)}
+.node.lock{opacity:.55}
+.ln{width:14px;height:3px;background:var(--line);flex:none}
+.gcard.locked{opacity:.92}
+.fig{display:flex;align-items:center;justify-content:center;gap:2px;color:var(--ink);margin:6px 0}
+.fc{text-align:center}
+.ex{padding:12px 0;border-bottom:1px dashed var(--line)}
+.ex:last-of-type{border-bottom:none}
+.boss{background:linear-gradient(160deg,#F6E3B4,#F0B9A4);color:#3b2b20;border:none}
+.boss .sub{color:#6b5546}
+@media (prefers-color-scheme:dark){ .boss{background:linear-gradient(160deg,#6a5530,#6e3f32);color:#fbefe0} .boss .sub{color:#e6cfba} }
+.moods .mood svg{display:block;margin:0 auto 2px}
+.bank{display:flex;flex-wrap:wrap;gap:8px}
+.bk{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:8px 30px 8px 12px;font-size:15px;line-height:1.3}
+.bk small{display:block;font-size:11px;color:var(--muted)}
+.bk .x{position:absolute;top:2px;left:4px;font-size:16px}
+.card.lav{background:#E9E1F3;border:none;color:#3b2b45}
+.card.lav .bk{background:#f6f1fb;border-color:#d6c9e8;color:#3b2b45}
+.card.lav .bk small{color:#7a6a8a}
+@media (prefers-color-scheme:dark){ .card.lav{background:#3d3350;color:#f0e8fa} .card.lav .bk{background:#4a3f60;border-color:#5a4d73;color:#f0e8fa} .card.lav .bk small{color:#c9bde0} }
+.seg{display:flex;gap:6px}
+.up{color:var(--sage-d,#4f7a5a);font-size:13px;font-weight:700}
+.mweek{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.mhead{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:12px;color:var(--muted);margin-bottom:2px}
+.mcell{font:inherit;background:none;border:none;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;padding:2px 0;border-radius:10px}
+.mcell span{font-size:11px;color:var(--muted)}
+.mcell.fut{opacity:.35;cursor:default}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:3px}
+.bars{display:flex;align-items:flex-end;gap:8px;height:100px;margin-top:4px}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px;font-size:11px}
+.bcol i{display:block;width:100%;border-radius:6px 6px 2px 2px}
+.bcol span{color:var(--muted);font-size:10px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stats div{background:var(--bg);border-radius:14px;padding:10px;text-align:center}
+.stats b{display:block;font-size:20px;font-family:'Varela Round',sans-serif}
+.stats span{font-size:12px;color:var(--muted)}
+.split{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--line);margin-top:10px}
+.split i{display:block;height:100%}
+
+</style>
+</head>
+<body>
+<div id="app"><div id="view"></div></div>
+<nav class="tabbar"><div class="tabbar-in">
+  <button class="tab" data-a="tab" data-tab="home"><span>🏡</span>בית</button>
+  <button class="tab" data-a="tab" data-tab="week"><span>🗓️</span>שבוע</button>
+  <button class="tab" data-a="tab" data-tab="money"><span>💰</span>כסף</button>
+  <button class="tab" data-a="tab" data-tab="work"><span>💪</span>אימון</button>
+  <button class="tab" data-a="tab" data-tab="hobby"><span>🎨</span>תחביבים</button>
+  <button class="tab" data-a="tab" data-tab="goals"><span>🌱</span>מטרות</button>
+  <button class="tab" data-a="tab" data-tab="write"><span>📓</span>כתיבה</button>
+</div></nav>
+<div id="toast"></div>
+<div id="letter"><div class="paper" id="paper"></div></div>
+<div id="sheet"><div class="sheet-in" id="sheet-in"></div></div>
+
+<script>
+/* ====== אפשר לשנות כאן את המכתב ====== */
+/* להחזרת המכתב: לשנות ל-true */
+const SHOW_LETTER = true;
+const LETTER_TITLE = 'לאהבה שלי,';
+const LETTER_BODY = [
+  'בניתי לך את הפינה הזאת כי אני רואה כמה את מנסה, וכמה היית רוצה קצת יותר סדר ושקט בראש.',
+  'זה מקום קוזי שהוא רק שלך. אפשר לבוא אליו בכל מצב רוח, ביום טוב וגם ביום קשה, ולהיות בדיוק כמו שאת. לשבת עם כוס קפה קר, לפתוח את היום או לסגור אותו, לכתוב, לנסות דברים חדשים, או סתם לנוח. אני איתך, בקצב שלך.',
+  'אני אוהב אותך. זה בשבילך ❤️'
+];
+const LETTER_SIGN = 'שלך, באהבה 💜';
+/* ==================================== */
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 9);
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const clamp = (v,a,b) => Math.min(b, Math.max(a, v));
+const dk = (d = new Date()) => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+const pd = s => new Date(s + 'T12:00:00');
+const addDays = (d,n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+const weekStart = (off=0) => { const x = new Date(); x.setHours(12,0,0,0); x.setDate(x.getDate() - x.getDay() + off*7); return x; };
+const wkOf = s => { const x = pd(s); x.setDate(x.getDate()-x.getDay()); return dk(x); };
+const fmtD = d => d.getDate() + '.' + (d.getMonth()+1);
+const KEY = 'cozy-corner-v1';
+const DAYS = ['ראשון','שני','שלישי','רביעי','חמישי','שישי','שבת'];
+
+const GROUPS = [
+  {k:'core',n:'בטן וליבה',e:'🔥'},
+  {k:'legs',n:'רגליים',e:'🦵'},
+  {k:'glutes',n:'ישבן',e:'🌸'},
+  {k:'arms',n:'ידיים וכתפיים',e:'💪'},
+  {k:'back',n:'גב וחזה',e:'🦋'}
+];
+const GN = k => GROUPS.find(g=>g.k===k);
+const MAX_GAP = 2;
+
+function defaults(){
+  return {
+    name:'', seenLetter:false,
+    routine:{ items:[], done:{}, sug:{}, tried:[] },
+    mood:{}, meTime:{},
+    hobbies:[], likes:{good:[],drain:[]},
+    goals:[], journal:{},
+    weeks:{}, plan:{},
+    bank:{ me:[], plan:[], routine:[] },
+    chores:[], choreDone:{}, wishes:[],
+    money:{ cycleDay:10, earn:{}, skip:{}, ladder:[{min:2500,days:4},{min:4000,days:3}], budget:0, prices:[], spent:{}, alloc:{fun:0,invest:0,liquid:0}, incomeOv:0 },
+    workout:{ fit:'', done:{core:0,legs:0,glutes:0,arms:0,back:0}, boss:0, adj:0, hist:[], ext:[], like:{}, dislike:{} }
+  };
+}
+function merge(o){
+  const d = defaults(), s = Object.assign(d, o);
+  s.workout = Object.assign(defaults().workout, o.workout||{}); s.workout.done = Object.assign(defaults().workout.done, (o.workout||{}).done||{});
+  s.money = Object.assign(defaults().money, o.money||{}); s.money.alloc = Object.assign({fun:0,invest:0,liquid:0}, (o.money||{}).alloc||{});
+  s.routine = Object.assign(defaults().routine, o.routine||{});
+  s.bank = Object.assign(defaults().bank, o.bank||{});
+  s.likes = Object.assign({good:[],drain:[]}, o.likes||{});
+  ['good','drain'].forEach(k => { s.likes[k] = (s.likes[k]||[]).map(x => typeof x==='string' ? {t:x,d:''} : x); });
+  ['ext'].forEach(k => { if(!Array.isArray(s.workout[k])) s.workout[k]=[]; });
+  ['like','dislike'].forEach(k => { if(!s.workout[k] || typeof s.workout[k]!=='object') s.workout[k]={}; });
+  ['chores','wishes'].forEach(k => { if(!Array.isArray(s[k])) s[k]=[]; });
+  if(!s.choreDone || typeof s.choreDone!=='object') s.choreDone = {};
+  return s;
+}
+function load(){
+  try{ const r = localStorage.getItem(KEY); if(r) return merge(JSON.parse(r)); }catch(e){}
+  return defaults();
+}
+let S = load();
+/* שמירה כפולה: localStorage + IndexedDB, כדי שנתונים לא ייעלמו */
+const store = {ls:null, idb:null, at:0};
+function lsTest(){ try{ localStorage.setItem('__t','1'); const ok = localStorage.getItem('__t')==='1'; localStorage.removeItem('__t'); return ok; }catch(e){ return false; } }
+function idbOpen(){ return new Promise((res,rej)=>{ try{ const r = indexedDB.open('cozy-db',1); r.onupgradeneeded = ()=>r.result.createObjectStore('kv'); r.onsuccess = ()=>res(r.result); r.onerror = ()=>rej(r.error); }catch(e){ rej(e); } }); }
+async function idbPut(str){ const db = await idbOpen(); return new Promise((res,rej)=>{ const tx = db.transaction('kv','readwrite'); tx.objectStore('kv').put(str,KEY); tx.oncomplete = ()=>{ db.close(); res(true); }; tx.onerror = ()=>rej(tx.error); }); }
+async function idbGet(){ const db = await idbOpen(); return new Promise((res,rej)=>{ const q = db.transaction('kv').objectStore('kv').get(KEY); q.onsuccess = ()=>{ db.close(); res(q.result); }; q.onerror = ()=>rej(q.error); }); }
+function statusText(){
+  if(store.ls===false && store.idb===false) return '⚠️ הנתונים לא נשמרים בדפדפן הזה';
+  const t = store.at ? new Date(store.at).toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'}) : '';
+  return '💾 נשמר בטלפון הזה' + (t ? ' · ' + t : '');
+}
+function paintStatus(){ const el = document.getElementById('sv'); if(el) el.textContent = statusText(); }
+let idbT;
+function save(now){
+  S._ts = Date.now(); const str = JSON.stringify(S); store.at = S._ts;
+  try{ localStorage.setItem(KEY, str); store.ls = true; }catch(e){ store.ls = false; }
+  clearTimeout(idbT);
+  const go = ()=>{ idbPut(str).then(()=>{ store.idb = true; paintStatus(); }).catch(()=>{ store.idb = false; paintStatus(); }); };
+  if(now) go(); else idbT = setTimeout(go, 400);
+  paintStatus();
+}
+window.addEventListener('pagehide', ()=>save(true));
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') save(true); });
+
+let moneyDate = '', moneyHow = '', moneyAmt = '';
+let tab = 'home', jdate = dk(), idea = '', surprise = '', wOff = 0, WT = [], W = null, CI = null, tmr = null;
+
+const MOODS = [
+  {k:'calm',l:'רגועה',c:'#8fc9a0',s:'איזה כיף. זה זמן טוב ליהנות מהשקט, או לעשות צעד קטן במטרה.'},
+  {k:'ok',l:'ככה-ככה',c:'#c3b1e1',s:'ככה-ככה זה לגמרי בסדר. אולי דבר קטן אחד שנעים לך, וזה מספיק להיום.'},
+  {k:'heavy',l:'עצובה',c:'#7aa7d9',s:'יום כבד. לא צריך לעשות הרבה. אפשר פשוט לכתוב את מה שמסתובב בראש, בלי לסדר אותו.'},
+  {k:'stress',l:'לחוצה',c:'#f2a65a',s:'בואי נעצור רגע. נשימה איטית, ובעוד דקה אפשר לפרוק על דף.'},
+  {k:'angry',l:'כועסת',c:'#e5675e',s:'כעס הוא רגש לגיטימי. אפשר לפרוק אותו על דף, בלי לסדר ובלי לשפוט.'},
+  {k:'energy',l:'שמחה',c:'#f6cf5a',s:'יש אנרגיה! אפשר לנצל אותה לאימון, לצעד במטרה או לנסות משהו חדש.'}
+];
+const ME_IDEAS = [
+  'קפה קר במקום נעים, בלי טלפון','הליכה של 15 דקות עם מוזיקה שאני אוהבת','מקלחת ארוכה ונעימה',
+  'לצייר או לשרבט 10 דקות, בלי לשפוט','לקרוא 10 עמודים','לבשל או לאפות משהו רק בשבילי',
+  'לשבת עם שמיכה וסדרה אהובה','לכתוב מכתב קצר לעצמי','לסדר פינה קטנה אחת בבית','לרקוד שיר אחד בסלון',
+  'לשים פלייליסט חדש ולשבת להקשיב','לצאת לשמש ל-10 דקות','למתוח את הגוף בלי לחשוב על כלום','להתקשר למישהו שטוב לי איתו'
+];
+const HOBBY_SOLO = ['ציור בצבעי מים','קריאה','אפייה','צמחים בבית','יוגה','ריקוד בסלון','קרמיקה','סריגה','צילום בטלפון','ללמוד שפה','קליגרפיה','פאזל','יומן ציורים','ללמוד לנגן','הליכה בטבע','לבנות פלייליסטים'];
+const HOBBY_TOGETHER = ['בישול ביחד','טיול ספונטני','ערב משחקי קופסה','פיקניק','סרט ביתי עם נשנושים','סדנה חד-פעמית ביחד','לבנות אלבום תמונות','שוק או פינת אוכל חדשה','שקיעה במקום יפה'];
+const GOAL_CHIPS = ['להיות בכושר','לקרוא יותר','לחזור לצייר','לישון טוב יותר','לאכול בצורה שנעימה לי','ללמוד משהו חדש'];
+/* ===== מאגרי הצעות ===== */
+const ROUT = {
+  morning:['כוס מים גדולה לפני הקפה','5 נשימות עמוקות ליד חלון פתוח','מתיחה קלה של 3 דקות עוד במיטה','לבחור דבר אחד שאני מצפה לו היום','קפה קר ושתייה בלי טלפון','לצאת לשמש ל-5 דקות','לשים שיר אהוב ולהתחיל איתו את היום','לסדר את המיטה, וזה כבר ניצחון קטן','ארוחת בוקר בישיבה, לא בעמידה','לכתוב שורה אחת: איך אני רוצה שהיום ירגיש','קרם פנים ומשפט טוב לעצמי','ללבוש משהו שנעים לי בו','לקחת ויטמינים או תרופות','לפתוח חלון ולאוורר את הבית','להשקות צמח','סיבובי כתפיים וצוואר, דקה אחת','להסתכל על היום ולבחור דבר אחד חשוב','לחייך למראה, באמת','פודקאסט קצר בזמן ההתארגנות','מקלחת נעימה ולא ממהרת'],
+  day:['הפסקה של 10 דקות בלי מסך','כוס מים עכשיו','לקום ולמתוח את הגב','הליכה של 10 דקות','לאכול משהו מזין ולשבת איתו','להודיע למישהו שאני חושבת עליו','דקה של נשימה איטית','להסתכל החוצה לשמיים 2 דקות','10 סיבובי כתפיים','פרי או חטיף שאני אוהבת','לשבת בשמש בלי לעשות כלום','5 דקות סידור פינה קטנה','שיר שמרים לי מצב רוח','רשימה קצרה של 3 דברים להיום','להתקשר למישהי שאני אוהבת','ידיים על הלב ושתי דקות שקט','לקרוא כמה עמודים','לצייר או לשרבט 5 דקות','אוויר צח בחוץ','להגיד לעצמי "מספיק טוב" אחרי משימה'],
+  evening:['לכתוב ביומן, אפילו שורה אחת','להתקלח ולהחליף לבגדים נוחים','לכבות מסך חצי שעה לפני השינה','לכתוב 3 דברים טובים מהיום','תה או קפה קר בשקט','להכין בגדים ושקית למחר','מתיחות עדינות לפני השינה','לסדר דבר אחד קטן בבית','לשים מוזיקה רגועה','לספר למישהו דבר אחד טוב מהיום','להרגיע את הכתפיים עם מקלחת חמה','להתכרבל עם סדרה אהובה','להניח את הטלפון בצד של החדר','נשימת 4-7-8, שלוש פעמים','להגיד תודה לעצמי על היום','לרשום מה אני רוצה ממחר','קרם ידיים ושמיכה','לקרוא עמוד או שניים','לשתות מים לפני השינה','לכבות אורות חזקים ולהדליק מנורה חמה']
+};
+const CHORE_BANK = [['לנקות אבק מהארון',90],['לשטוף פילטרים של המזגן',90],['לנקות את האוטו מבפנים',30],['לשטוף את האוטו מבחוץ',30],['לשטוף כלים',1],['לכבס',7],['להחליף מצעים',14],['לשאוב אבק',7],['לשטוף רצפה',10],['לנקות את המקרר',30],['לסדר את המגירה הכי מבולגנת',60],['לנקות מראות וחלונות',30],['להוציא זבל ומיחזור',3],['לנקות את האמבטיה',10],['לסדר את הארון ולתרום בגדים',90],['לנקות את התנור',60],['להשקות ולגזום צמחים',7],['לנקות נעליים',30],['לעבור על תאריכי תוקף במזווה',60],['לנקות את הטלפון והמסך',14],['לנקות מאחורי הספה',90],['לעבור על ניירת ולסדר',60],['לנגב את המטבח',2],['להחליף מגבות',7],['לגהץ',14]];
+
+const J_SECS = [
+  {k:'good',t:'דברים טובים שקרו היום',e:'🌼',ph:'משהו טוב, גם קטן'},
+  {k:'hard',t:'דברים פחות טובים (מותר!)',e:'🌧️',ph:'משהו שהיה לי קשה'},
+  {k:'learned',t:'דברים חדשים שלמדתי',e:'💡',ph:'למדתי ש…'},
+  {k:'want',t:'דברים שבא לי לעשות',e:'✨',ph:'בא לי…'}
+];
+const J_PROMPTS = [
+  'מה היה הרגע הכי רך שלי היום?','מה הגוף שלי ביקש היום?','על מה אני סולחת לעצמי היום?',
+  'מה עשה לי טוב היום, אפילו קצת?','איזו מחשבה חוזרת היום, ומה היא רוצה להגיד לי?','מה אני צריכה עכשיו?','על מה אני גאה בעצמי השבוע?'
+];
+
+/* תרגילים: [שם, סוג (r חזרות / rs לכל צד / t שניות), בסיס, טיפ], מהקל אל הקשה */
+const EX = {
+  core:[
+    ['כפיפות בטן קלות','r',10,'ידיים ליד האוזניים, מרימים רק את הכתפיים. הצוואר רפוי.'],
+    ["ג'וק על הגב (Dead bug)",'rs',6,'שוכבת על הגב, ידיים ישר לתקרה, ברכיים מקופלות ב-90 מעלות מעל האגן. מורידות לאט יד אחת מעל הראש ורגל הפוכה קדימה, וחוזרות. הגב התחתון נשאר צמוד לרצפה.'],
+    ['הרמת ברכיים בשכיבה','r',10,'מקפלות ברכיים ומרימות אגן קלות מהרצפה, לאט.'],
+    ['קרש (פלאנק)','t',20,'על המרפקים או על הברכיים. גוף ישר, בטן מכווצת.'],
+    ['אופניים בשכיבה','r',14,'מרפק לברך הנגדית, בקצב רגוע.'],
+    ['טוויסט רוסי','r',14,'יושבת בהטיה קלה אחורה, מסובבת את הפלג הגוף.'],
+    ['הרמת רגליים ישרות','r',10,'הגב צמוד לרצפה. אם קשה, מקפלות קצת ברכיים.'],
+    ['טיפוס הרים','t',20,'פלאנק גבוה, ברכיים לחזה בקצב קבוע.'],
+    ['קרש צד','t',15,'לכל צד. אפשר על הברך התחתונה.'],
+    ['מספריים','t',20,'רגליים ישרות מעל הרצפה, מצליבות לאט.']
+  ],
+  legs:[
+    ['סקוואט (כריעה)','r',12,'ברכיים לכיוון האצבעות, משקל על העקבים.'],
+    ['הרמות עקבים','r',15,'עומדות על קצות האצבעות ויורדות לאט.'],
+    ['פסיעה לאחור','rs',8,'צעד גדול אחורה, הברך האחורית יורדת לכיוון הרצפה.'],
+    ['סקוואט סומו','r',12,'רגליים רחבות, אצבעות החוצה.'],
+    ['עליות לכיסא','rs',8,'כיסא יציב. עולות, ויורדות לאט.'],
+    ['הליכת פסיעות','r',10,'פסיעה קדימה וירידה, מתחלפות. אפשר להתייצב בכל פעם.'],
+    ['ישיבת קיר','t',25,'גב צמוד לקיר, זווית של 90 מעלות בברכיים.'],
+    ['קפיצות סקוואט','r',8,'נחיתה רכה. אפשר לוותר על הקפיצה ולהישאר בסקוואט.'],
+    ['סקוואט בולגרי','rs',6,'רגל אחורית על כיסא. יורדות לאט ובשליטה.'],
+    ['סקוואט על רגל אחת עם תמיכה','rs',5,'מחזיקות בקיר או בכיסא, ירידה איטית.']
+  ],
+  glutes:[
+    ['גשר ישבן','r',12,'לוחצות עקבים לרצפה ומרימות אגן, סוחטות בחלק העליון.'],
+    ['צדפה (Clamshell)','rs',12,'שוכבת על הצד, ברכיים מקופלות, פותחת ברך עליונה.'],
+    ['בעיטה לאחור על ארבע','rs',12,'גב ישר, מרימה עקב לתקרה ולא מקמרת את הגב.'],
+    ['הרמת רגל בצד','rs',12,'שוכבת על הצד, רגל ישרה עולה ויורדת לאט.'],
+    ['משאבות צפרדע','r',15,'כפות רגליים צמודות, ברכיים החוצה, מרימות אגן.'],
+    ['הרמת ברך לצד על ארבע','rs',10,'כמו כלב ליד עץ. תנועה קטנה ומבוקרת.'],
+    ['צעד צד בסקוואט','r',12,'ירידה קלה לסקוואט וצעדים לצדדים.'],
+    ['גשר על רגל אחת','rs',8,'רגל אחת באוויר, האגן נשאר ישר.'],
+    ['הרמת אגן עם כתפיים על ספה','r',12,'עומדת על כתפיים על ספה יציבה, מרימות אגן עד קו ישר.'],
+    ['גשר עם עצירה','r',10,'בחלק העליון עוצרות 3 שניות.']
+  ],
+  arms:[
+    ['סיבובי ידיים','r',20,'ידיים לצדדים, מעגלים קטנים, קדימה ואחורה.'],
+    ['שכיבות סמיכה על הקיר','r',12,'גוף ישר, מקרבות חזה לקיר.'],
+    ['הרמות לצד עם בקבוקי מים','r',12,'מרפקים רכים, מרימות עד גובה הכתפיים.'],
+    ['כיפוף ביצפס עם בקבוקים','r',12,'מרפקים צמודים לגוף.'],
+    ['שכיבות סמיכה על הברכיים','r',8,'גוף ישר מהברכיים עד הראש.'],
+    ['טריצפס על כיסא','r',8,'כיסא יציב. ירידה איטית של המרפקים אחורה.'],
+    ['נגיעות כתף בפלאנק','r',12,'פלאנק גבוה, נוגעות בכתף הנגדית, האגן יציב.'],
+    ['שכיבות סמיכה','r',8,'אפשר להישאר על הברכיים ולהתקדם כשמרגיש קל.'],
+    ['שכיבות סמיכה צרות','r',6,'ידיים קרובות זו לזו, מרפקים לצדדים.'],
+    ['פייק (הר הפוך)','r',6,'אגן גבוה, מורידות את הראש לעבר הרצפה.']
+  ],
+  back:[
+    ['סופרמן','r',10,'שוכבת על הבטן, מרימות ידיים ורגליים מעט ועוצרות שנייה.'],
+    ['כלב-ציפור','rs',8,'על ארבע, יד ורגל הפוכה נמתחות. אגן יציב.'],
+    ['שחייה בשכיבה','t',20,'מרימות יד ורגל הפוכה לסירוגין, בקצב רגוע.'],
+    ['חתירה עם בקבוקים או תיק','r',12,'גב ישר, מושכות מרפקים לאחור ומקרבות שכמות.'],
+    ['Y-T-W על הרצפה','r',8,'שוכבת על הבטן, ידיים בצורת אותיות.'],
+    ['מלאך שלג הפוך','r',10,'שוכבת על הבטן, ידיים נעות כמו במלאך שלג.'],
+    ['שכיבות סמיכה רחבות על הברכיים','r',8,'ידיים רחבות מהכתפיים, עובדות על החזה.'],
+    ['סופרמן מתחלף עם עצירה','r',10,'יד ורגל הפוכה, עצירה של 2 שניות.'],
+    ['שכיבות סמיכה רחבות','r',8,'ידיים רחבות, גוף ישר.'],
+    ['חתירה על רגל אחת','rs',8,'איזון על רגל אחת. אפשר להיעזר בקיר.']
+  ]
+};
+/* figures: stick-figure poses via forward kinematics. angles in degrees, 0=right, 90=up */
+const FD = Math.PI/180;
+const fpt = (p,a,l) => [p[0] + l*Math.cos(a*FD), p[1] - l*Math.sin(a*FD)];
+function figGeom(o){
+  const H = o.h, S = fpt(H, o.t, 32), hd = fpt(S, o.n ?? o.t, 15);
+  const arm = a => { const e = fpt(S,a[0],16), w = fpt(e,a[1],15); return [S,e,w]; };
+  const leg = a => { const k = fpt(H,a[0],21), n = fpt(k,a[1],21), f = fpt(n,a[2],9); return [H,k,n,f]; };
+  return {head:hd, torso:[H,S], an:arm(o.an), af:arm(o.af||o.an), ln:leg(o.ln), lf:leg(o.lf||o.ln)};
+}
+const f1 = v => v.toFixed(1);
+function poseSVG(o, w){
+  const g = figGeom(o), fl = o.g ?? 104;
+  const pl = (pts,op) => `<polyline points="${pts.map(q=>f1(q[0])+','+f1(q[1])).join(' ')}" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="${op}"/>`;
+  let s = `<path d="M6 ${fl} H134" stroke="currentColor" stroke-width="1.5" opacity=".3"/>`;
+  (o.p||[]).forEach(p => {
+    if(p[0]==='L') s += `<path d="M${p[1]} ${p[2]} L${p[3]} ${p[4]}" stroke="currentColor" stroke-width="5" stroke-linecap="round" opacity=".28"/>`;
+    if(p[0]==='R') s += `<rect x="${p[1]}" y="${p[2]}" width="${p[3]}" height="${p[4]}" rx="2" fill="currentColor" opacity=".28"/>`;
+  });
+  s += pl(g.af,.4) + pl(g.lf,.4) + pl(g.torso,1) + pl(g.ln,1) + pl(g.an,1);
+  s += `<circle cx="${f1(g.head[0])}" cy="${f1(g.head[1])}" r="8" fill="var(--card,#fff)" stroke="currentColor" stroke-width="3.5"/>`;
+  return `<svg viewBox="0 -12 140 130" width="${w||120}" height="${Math.round((w||120)*130/140)}" role="img" aria-hidden="true">${s}</svg>`;
+}
+
+/* ===== shared poses ===== */
+const ST   = {h:[60,62], t:90, an:[283,276], af:[262,268], ln:[272,270,0], lf:[262,268,0]};
+const STF  = {h:[70,62], t:90, an:[265,270], af:[275,270], ln:[272,270,0], lf:[268,270,180]};
+const LB_A = {h:[84,98], t:180, n:170, an:[120,200], ln:[55,300,0], lf:[50,305,0], g:102};   // lying, knees bent, hands behind head
+const LB_FLAT = {h:[84,98], t:180, n:170, an:[0,0], ln:[0,0,90], g:102};
+const QUAD = {h:[84,82], t:164, n:170, an:[270,270], ln:[270,0,90], lf:[270,0,90]};
+const HPLANK = {h:[69.5,85.5], t:157, n:150, an:[270,270], ln:[337,337,300]};
+const BRIDGE_UP = {h:[80,88], t:205, n:195, an:[0,0], ln:[28,285,0], g:104};
+const PU_TOP = {h:[69.1,83.4], t:155.2, n:150, an:[270,270], ln:[335.2,335.2,300]};
+const PU_BOT = {h:[75.7,96.4], t:172.2, n:165, an:[300,200], ln:[352.2,352.2,300]};
+const KPU_TOP = {h:[66,90.7], t:144.2, n:140, an:[270,270], ln:[324.2,0,270]};
+const KPU_BOT = {h:[74.7,97], t:163.6, n:158, an:[335,200], ln:[343.6,0,270]};
+const PRONE = {h:[88,98], t:180, n:168, an:[180,180], ln:[0,0,270], g:102};
+const SUP = {...PRONE, t:170, n:140, an:[148,148], ln:[22,22,270]};
+const LUNGE = {h:[56,84], t:90, an:[270,270], ln:[8,278,0], lf:[255,170,270]};
+const SQUAT_DOWN = {h:[40,84], t:62, n:62, an:[10,10], ln:[8,280,0]};
+
+const FIGS = {
+  "כפיפות בטן קלות": [LB_A, {...LB_A, t:160, n:140}],
+  "ג'וק על הגב (Dead bug)": [
+    {h:[84,98], t:180, n:170, an:[90,90], ln:[90,0,90], g:102},
+    {h:[84,98], t:180, n:170, an:[150,150], af:[90,90], ln:[90,0,90], lf:[12,8,90], g:102}
+  ],
+  "הרמת ברכיים בשכיבה": [
+    {...LB_FLAT, ln:[90,0,90]},
+    {h:[84,92], t:190, n:182, an:[0,0], ln:[110,20,90], g:102}
+  ],
+  "קרש (פלאנק)": [{h:[78,91], t:172, n:165, an:[270,180], ln:[345,345,300]}],
+  "אופניים בשכיבה": [
+    {h:[84,98], t:165, n:145, an:[120,200], ln:[110,330,0], lf:[8,8,90], g:102},
+    {h:[84,98], t:165, n:145, an:[120,200], ln:[8,8,90], lf:[110,330,0], g:102}
+  ],
+  "טוויסט רוסי": [{h:[78,98], t:118, n:112, an:[20,20], ln:[40,330,0], lf:[35,325,0], g:104}],
+  "הרמת רגליים ישרות": [{...LB_FLAT, ln:[8,8,90]}, {...LB_FLAT, ln:[90,90,90]}],
+  "טיפוס הרים": [
+    {...HPLANK, lf:[150,300,270]},
+    {...HPLANK, ln:[150,300,270], lf:[337,337,300]}
+  ],
+  "קרש צד": [{h:[78,91], t:172, n:165, an:[270,180], af:[90,90], ln:[345,345,300]}],
+  "מספריים": [
+    {...LB_FLAT, n:155, ln:[35,35,90], lf:[10,10,90]},
+    {...LB_FLAT, n:155, ln:[10,10,90], lf:[35,35,90]}
+  ],
+
+  "סקוואט (כריעה)": [{...ST, an:[0,0]}, SQUAT_DOWN],
+  "הרמות עקבים": [ST, {h:[60,56], t:90, an:[270,270], ln:[270,270,310]}],
+  "פסיעה לאחור": [ST, LUNGE],
+  "סקוואט סומו": [
+    {h:[70,64], t:90, an:[270,270], ln:[295,270,0], lf:[245,270,180]},
+    {h:[70,72], t:90, an:[270,270], ln:[330,270,0], lf:[210,270,180]}
+  ],
+  "עליות לכיסא": [
+    {h:[52,62], t:90, an:[270,270], ln:[346,270,0], lf:[270,270,0], p:[['R',66,88,44,4],['L',70,92,70,104],['L',106,92,106,104]]},
+    {h:[96,46], t:90, an:[270,270], ln:[270,270,0], lf:[60,300,0], p:[['R',66,88,44,4],['L',70,92,70,104],['L',106,92,106,104]]}
+  ],
+  "הליכת פסיעות": [ST, LUNGE],
+  "ישיבת קיר": [{h:[46,83], t:90, an:[0,0], ln:[0,270,0], p:[['L',38,20,38,104]]}],
+  "קפיצות סקוואט": [
+    {...SQUAT_DOWN, an:[250,250]},
+    {h:[60,48], t:90, an:[100,100], ln:[265,265,300]}
+  ],
+  "סקוואט בולגרי": [
+    {h:[52,76], t:90, an:[270,270], ln:[340,275,0], lf:[215,130,270], p:[['R',2,86,26,4],['L',8,90,8,104],['L',24,90,24,104]]},
+    {h:[52,84], t:90, an:[270,270], ln:[8,280,0], lf:[190,160,270], p:[['R',2,86,26,4],['L',8,90,8,104],['L',24,90,24,104]]}
+  ],
+  "סקוואט על רגל אחת עם תמיכה": [
+    {h:[60,62], t:90, an:[10,10], ln:[270,270,0], lf:[270,190,270], p:[['L',108,20,108,104]]},
+    {h:[48,78], t:90, an:[10,10], ln:[8,282,0], lf:[22,15,90], p:[['L',108,20,108,104]]}
+  ],
+
+  "גשר ישבן": [{...LB_A, an:[0,0]}, BRIDGE_UP],
+  "צדפה (Clamshell)": [
+    {h:[84,86], t:180, n:172, an:[120,200], ln:[330,160,0], lf:[330,160,0], g:104},
+    {h:[84,86], t:180, n:172, an:[120,200], ln:[20,160,0], lf:[330,160,0], g:104}
+  ],
+  "בעיטה לאחור על ארבע": [
+    {...QUAD},
+    {...QUAD, lf:[10,100,170]}
+  ],
+  "הרמת רגל בצד": [
+    {h:[84,98], t:180, n:172, an:[120,200], ln:[0,0,90], lf:[0,0,90], g:102},
+    {h:[84,98], t:180, n:172, an:[120,200], ln:[38,38,90], lf:[0,0,90], g:102}
+  ],
+  "משאבות צפרדע": [{...LB_A, an:[0,0]}, BRIDGE_UP],
+  "הרמת ברך לצד על ארבע": [
+    {...QUAD},
+    {...QUAD, ln:[20,270,0]}
+  ],
+  "צעד צד בסקוואט": [
+    {...STF},
+    {h:[70,72], t:90, an:[20,20], af:[160,160], ln:[320,270,0], lf:[220,270,180]}
+  ],
+  "גשר על רגל אחת": [BRIDGE_UP, {...BRIDGE_UP, ln:[50,50,90]}],
+  "הרמת אגן עם כתפיים על ספה": [
+    {h:[77,92], t:151, n:145, an:[0,0], ln:[20,290,0], p:[['R',14,74,34,30]]},
+    {h:[80,76], t:180, n:172, an:[0,0], ln:[0,280,0], p:[['R',14,74,34,30]]}
+  ],
+  "גשר עם עצירה": [BRIDGE_UP],
+
+  "סיבובי ידיים": [{...STF, an:[0,0], af:[180,180]}],
+  "שכיבות סמיכה על הקיר": [
+    {h:[69.3,65], t:68.6, n:68, an:[0,0], ln:[248.6,248.6,0], p:[['L',114,10,114,104]]},
+    {h:[78.4,69.9], t:54.4, n:54, an:[300,60], ln:[235.6,235.6,0], p:[['L',114,10,114,104]]}
+  ],
+  "הרמות לצד עם בקבוקי מים": [
+    {...STF},
+    {...STF, an:[0,0], af:[180,180]}
+  ],
+  "כיפוף ביצפס עם בקבוקים": [{...ST, an:[285,290], af:[285,290]}, {...ST, an:[300,70], af:[300,70]}],
+  "שכיבות סמיכה על הברכיים": [KPU_TOP, KPU_BOT],
+  "טריצפס על כיסא": [
+    {h:[58,83], t:110.6, n:105, an:[270,270], ln:[350,270,0], p:[['R',14,82,38,4],['L',18,86,18,104],['L',46,86,46,104]]},
+    {h:[58,95], t:110.6, n:105, an:[240,325], ln:[30,270,0], p:[['R',14,82,38,4],['L',18,86,18,104],['L',46,86,46,104]]}
+  ],
+  "נגיעות כתף בפלאנק": [
+    HPLANK,
+    {...HPLANK, an:[100,320]}
+  ],
+  "שכיבות סמיכה": [PU_TOP, PU_BOT],
+  "שכיבות סמיכה צרות": [PU_TOP, PU_BOT],
+  "פייק (הר הפוך)": [
+    PU_TOP,
+    {h:[70,61], t:201.8, n:250, an:[270,270], ln:[276,276,0]}
+  ],
+
+  "סופרמן": [PRONE, SUP],
+  "כלב-ציפור": [
+    {...QUAD},
+    {...QUAD, an:[180,180], af:[270,270], ln:[270,0,90], lf:[2,2,270]}
+  ],
+  "שחייה בשכיבה": [
+    PRONE,
+    {...PRONE, t:172, n:145, an:[148,148], af:[180,180], ln:[0,0,270], lf:[22,22,270]}
+  ],
+  "חתירה עם בקבוקים או תיק": [
+    {h:[50,64], t:20, n:20, an:[270,270], ln:[285,255,0]},
+    {h:[50,64], t:20, n:20, an:[200,300], ln:[285,255,0]}
+  ],
+  "Y-T-W על הרצפה": [
+    {...PRONE, t:176, n:152, an:[155,155], ln:[0,0,270]},
+    {...PRONE, t:176, n:152, an:[250,110], ln:[0,0,270]}
+  ],
+  "מלאך שלג הפוך": [
+    {...PRONE, t:176, n:152, an:[155,155], ln:[0,0,270]},
+    {...PRONE, t:176, n:152, an:[10,10], ln:[0,0,270]}
+  ],
+  "שכיבות סמיכה רחבות על הברכיים": [KPU_TOP, KPU_BOT],
+  "סופרמן מתחלף עם עצירה": [
+    PRONE,
+    {...PRONE, t:170, n:140, an:[148,148], af:[180,180], ln:[0,0,270], lf:[22,22,270]}
+  ],
+  "שכיבות סמיכה רחבות": [PU_TOP, PU_BOT],
+  "חתירה על רגל אחת": [
+    {h:[70,62], t:15, n:15, an:[270,270], ln:[270,270,0], lf:[178,178,90]},
+    {h:[70,62], t:15, n:15, an:[200,300], ln:[270,270,0], lf:[178,178,90]}
+  ],
+
+  "ברפי קליל (בלי קפיצה)": [HPLANK, ST]
+};
+
+function figHTML(n){
+  const p = FIGS[n]; if(!p) return '';
+  const cap = p.length>1 ? ['התחלה','סיום'] : ['תנוחה'];
+  return `<div class="fig">${p.map((q,i)=>`<div class="fc">${poseSVG(q,112)}<div class="sub" style="font-size:12px">${cap[i]}</div></div>${i<p.length-1?'<span class="sub" style="font-size:20px">←</span>':''}`).join('')}</div>`;
+}
+const BURPEE = ['ברפי קליל (בלי קפיצה)','r',6,'צעד אחורה לפלאנק, צעד קדימה וקימה. בלי קפיצות.'];
+const FIT_NAMES = {beginner:'מתחילה', mid:'בינונית', fit:'בכושר'};
+
+/* ===== לוגיקת משחק האימונים (30 שלבים, בוס כל 5) ===== */
+const MAXST = 30;
+const isBossSt = s => s % 5 === 0;
+const cnt = a => (a||[]).filter(x => (x||'').trim()).length;
+const daysSince = s => s ? Math.round((pd(dk()) - pd(s)) / 864e5) : 9999;
+function effMult(){
+  const base = {beginner:.8, mid:1, fit:1.3}[S.workout.fit] || 1;
+  const all = [...S.workout.hist, ...S.workout.ext];
+  const weeks = new Set(all.map(h => wkOf(h.d))).size;
+  return clamp(base + S.workout.adj + Math.min(.3, .05*Math.max(0, weeks-1)), .5, 1.9);
+}
+function scaleV(base,type,stage,boost){
+  const v = base * effMult() * (1 + .04*(stage-1)) * (boost||1);
+  return type==='t' ? clamp(Math.round(v/5)*5, 10, 90) : clamp(Math.round(v), 4, 45);
+}
+const setsFor = stage => stage<=6 ? 2 : stage<=18 ? 3 : 4;
+const mkEx = (e,stage,gk,boost,sets) => ({n:e[0], type:e[1], v:scaleV(e[2],e[1],stage,boost), tip:e[3], sets: sets || setsFor(stage), g:gk, ix:EX[gk].indexOf(e)});
+/* חלון של 5 תרגילים: מתקדם לאורך 30 שלבים, מעדיף אהובים, מדלג על לא אהובים */
+function pickWindow(gk,stage){
+  const pool = EX[gk], n = pool.length, center = (stage-1)*(n-1)/(MAXST-1);
+  const lk = S.workout.like, ds = S.workout.dislike;
+  return pool.map((e,i) => ({i, s: Math.abs(i-center) - (lk[e[0]]?1.6:0) + (ds[e[0]]?50:0) + ((stage*7+i*3)%5)*.35}))
+    .sort((a,b)=>a.s-b.s).slice(0,5).map(x=>x.i).sort((a,b)=>a-b);
+}
+function buildWorkout(gk,stage){
+  if(!isBossSt(stage)) return pickWindow(gk,stage).map(i => mkEx(EX[gk][i], stage, gk));
+  const idx = new Set();
+  for(let p=stage-4; p<=stage-1; p++) pickWindow(gk,p).forEach(i => idx.add(i));
+  const center = (stage-1)*(EX[gk].length-1)/(MAXST-1);
+  EX[gk].map((e,i)=>i).filter(i => !idx.has(i) && !S.workout.dislike[EX[gk][i][0]]).sort((a,b)=>Math.abs(a-center)-Math.abs(b-center)).forEach(i => { if(idx.size < 7) idx.add(i); });
+  const list = [...idx].sort((a,b)=>a-b).slice(-8).map(i => mkEx(EX[gk][i], stage, gk, 1.15, setsFor(stage)+1));
+  return list.slice(0,8);
+}
+const fmtEx = x => x.type==='t' ? x.v+' שניות' : x.type==='rs' ? x.v+' לכל צד' : x.v+' חזרות';
+const lockInfo = gk => { const d = S.workout.done, need = d[gk] - MAX_GAP; return GROUPS.filter(g => g.k!==gk && d[g.k] < need); };
+const isLocked = gk => lockInfo(gk).length > 0;
+function startGroup(gk){
+  if(!S.workout.fit){ toast('קודם נבחר רמת כושר'); tab='work'; return; }
+  if(S.workout.done[gk] >= MAXST){ toast('סיימת את כל 30 השלבים כאן 🏆'); tab='work'; return; }
+  const li = lockInfo(gk);
+  if(li.length){ toast('כדי להמשיך כאן, כדאי קודם: ' + li.map(g=>g.n).join(', ')); tab='work'; return; }
+  const stage = S.workout.done[gk] + 1, boss = isBossSt(stage), list = buildWorkout(gk, stage);
+  W = {kind:'g', g:gk, stage, boss, title:(boss?'👑 בוס ':GN(gk).e+' אימון ')+GN(gk).n, list, checks:list.map(x=>Array(x.sets).fill(false)), fin:false, res:null};
+  tab = 'work';
+}
+function swapEx(i,dislike){
+  const x = W.list[i]; if(!x) return;
+  if(dislike){ S.workout.dislike[x.n] = true; delete S.workout.like[x.n]; }
+  const used = new Set(W.list.map(y=>y.n));
+  const cand = EX[x.g].map((e,ix)=>({e,ix})).filter(o => !used.has(o.e[0]) && !S.workout.dislike[o.e[0]]).sort((a,b)=>Math.abs(a.ix-x.ix)-Math.abs(b.ix-x.ix));
+  if(!cand.length){ toast('אין כרגע תרגיל חלופי'); return; }
+  const nx = mkEx(cand[0].e, W.stage, x.g, W.boss?1.15:1, x.sets);
+  W.list[i] = nx; W.checks[i] = Array(nx.sets).fill(false);
+  toast(dislike ? 'לא אציע לך אותו שוב. החלפתי ב: '+nx.n : 'החלפתי ב: '+nx.n);
+}
+function finishWorkout(q){
+  const adjMap = {easy:.1, ok:0, hard:-.1};
+  S.workout.adj = clamp(S.workout.adj + adjMap[q], -.4, .6);
+  const msgs = [];
+  S.workout.done[W.g]++;
+  msgs.push(W.boss ? 'ניצחת את הבוס של '+GN(W.g).n+' בשלב '+W.stage+'! 👑' : 'סיימת שלב '+W.stage+' ב'+GN(W.g).n+' 🎉');
+  if(S.workout.done[W.g] >= MAXST) msgs.push('🏆 סיימת את כל 30 השלבים ב'+GN(W.g).n+'!');
+  else { const li = lockInfo(W.g); msgs.push(li.length ? 'כדי לפתוח את השלב הבא כאן, כדאי לאמן קודם: '+li.map(g=>g.n).join(', ')+'.' : 'השלב הבא כבר פתוח, ואפשר להמשיך מתי שבא לך.'); }
+  if(isBossSt(S.workout.done[W.g]+1) && S.workout.done[W.g] < MAXST) msgs.push('👑 השלב הבא ב'+GN(W.g).n+' הוא בוס: משלב את מה שעשית ב-4 השלבים האחרונים.');
+  S.workout.hist.push({d:dk(), k:W.g, s:W.stage});
+  markWorkoutPlan(W.g);
+  W.res = msgs; W.fin = false;
+}
+function markWorkoutPlan(g){
+  const it = (S.plan[dk()]||[]).find(it => it.kind==='workout' && !it.done && (g ? (it.g===g || !it.g) : true));
+  if(it) it.done = true;
+}
+const sportDates = () => new Set([...S.workout.hist, ...S.workout.ext].map(h=>h.d));
+const EXT_TYPES = ['פילאטיס','ריצה','קיקבוקסינג','סטודיו','יוגה','הליכה','שחייה','ריקוד','רכיבה'];
+let extSel = '';
+
+/* ===== שבוע ותכנון ===== */
+const weekDates = ws => Array.from({length:7}, (_,i) => dk(addDays(ws,i)));
+const SHIFTS = {
+  morning:{l:'🌤️ בוקר', h:'11:30–17:00', free:'ערב פנוי (אחרי 17:00) ובוקר עד 11:00', w:'בערב'},
+  evening:{l:'🌙 ערב', h:'17:00–22:30', free:'בוקר ועד 16:30 פנוי', w:'בבוקר'},
+  double:{l:'⏱️ כפולה', h:'11:30–22:30', free:'יום מלא, בלי חלון פנוי. מותר פשוט לנוח אחריו', w:''}
+};
+const shiftOf = (cfg,date) => cfg && cfg.shift ? cfg.shift[pd(date).getDay()] : '';
+function nextGroup(dateStr){
+  const ws = pd(wkOf(dateStr)), planned = {};
+  weekDates(ws).forEach(d => (S.plan[d]||[]).forEach(it => { if(it.g) planned[it.g] = (planned[it.g]||0)+1; }));
+  const sc = GROUPS.map(g => ({g, v: S.workout.done[g.k] + (planned[g.k]||0) + Math.random()*.1 + (isLocked(g.k)?5:0) + (S.workout.done[g.k]>=MAXST?99:0)})).sort((a,b)=>a.v-b.v);
+  return sc[0].g;
+}
+const bankPlan = kinds => S.bank.plan.filter(x => kinds.includes(x.kind)).map(x=>x.t);
+function mePool(){
+  return [...ME_IDEAS, ...S.bank.me, ...bankPlan(['me','custom']), ...S.likes.good.map(x=>x.t), ...S.wishes.filter(w=>!w.done).map(w=>w.t)];
+}
+/* מטלות */
+function choreCands(){
+  const out = [];
+  S.chores.forEach(c => { const ds = daysSince(c.last); if(!c.last || ds >= c.every) out.push({t:c.t, mine:true, ds}); });
+  CHORE_BANK.forEach(([t,ev]) => { if(S.chores.some(c=>c.t===t)) return; const ds = daysSince(S.choreDone[t]); if(ds >= Math.max(1,Math.round(ev*.8))) out.push({t, mine:false, ds, ev}); });
+  return out;
+}
+function choreSuggest(n){
+  const c = choreCands(), mine = c.filter(x=>x.mine), rest = c.filter(x=>!x.mine);
+  const shuffle = a => a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(p=>p[1]);
+  return [...shuffle(mine), ...shuffle(rest)].slice(0, n||1);
+}
+function markChore(t,date){
+  S.choreDone[t] = date;
+  const u = S.chores.find(x=>x.t===t); if(u){ if(u.every===0) S.chores = S.chores.filter(x=>x!==u); else u.last = date; }
+}
+function makeItem(kind,date){
+  if(kind==='workout'){
+    const bw = bankPlan(['workout']);
+    if(bw.length && Math.random()<.3) return {id:uid(), kind, g:null, t:'💪 '+pick(bw), done:false};
+    const g = nextGroup(date); return {id:uid(), kind, g:g.k, t:'💪 אימון '+g.n, done:false};
+  }
+  if(kind==='hobby'){
+    const w = S.hobbies.filter(h=>h.status==='want'), fav = S.hobbies.filter(h=>h.status==='tried' && h.rating>=4);
+    let t;
+    if(fav.length && Math.random()<.3) t = 'שוב: '+pick(fav).t;
+    else t = w.length ? pick(w).t : pick([...HOBBY_SOLO, ...bankPlan(['hobby'])]);
+    return {id:uid(), kind, t:'🎨 לנסות: '+t.replace(/^שוב: /,'שוב: '), done:false};
+  }
+  if(kind==='me') return {id:uid(), kind, t:'☕ '+pick(mePool()), done:false};
+  if(kind==='together') return {id:uid(), kind, t:'💞 '+pick([...HOBBY_TOGETHER, ...bankPlan(['together'])]), done:false};
+  if(kind==='chore'){ const c = choreSuggest(1)[0]; const t = c ? c.t : 'לסדר פינה קטנה אחת'; return {id:uid(), kind, c:t, t:'🧹 '+t, done:false}; }
+  if(kind==='wish'){ const w = S.wishes.filter(x=>!x.done); return {id:uid(), kind:'me', t:'✨ '+(w.length ? pick(w).t : pick(mePool())), done:false}; }
+  return {id:uid(), kind:'rest', t:'😴 יום מנוחה, בלי תוכניות', done:false};
+}
+function addPlan(date,kind){ (S.plan[date] ||= []).push(makeItem(kind,date)); }
+const isWork = (ws,date) => { const c = S.weeks[dk(ws)]; return c ? c.work.includes(pd(date).getDay()) : false; };
+function suggestWeek(ws){
+  const c = S.weeks[dk(ws)]; if(!c) return 0;
+  const seq = ['workout','hobby','together','workout','me','chore'];
+  let n = 0;
+  weekDates(ws).forEach(d => {
+    if(pd(d) < addDays(new Date(),-1) || (S.plan[d]||[]).length) return;
+    const work = c.work.includes(pd(d).getDay()), sh = shiftOf(c,d);
+    if(work && (!sh || sh==='double')) return;
+    let kind = seq[n % seq.length]; n++;
+    if(work && kind==='workout' && sh==='evening') kind = 'me';
+    addPlan(d, kind);
+    if(work){ const it = S.plan[d][S.plan[d].length-1]; it.t += ' · '+SHIFTS[sh].w; }
+  });
+  return n;
+}
+
+/* ===== דיקטציה ===== */
+let dict = null, dictOn = false;
+try{
+  if(window.claude && claude.use){
+    claude.use('dictation').then(d => {
+      if(!d) return; dict = d;
+      d.onFinal(({text}) => { const el = document.getElementById('cit'); if(el){ el.value = (el.value ? el.value+' ' : '') + text; if(CI) CI.text = el.value; } const p = document.getElementById('partial'); if(p) p.textContent=''; });
+      d.onPartial(({text}) => { const p = document.getElementById('partial'); if(p) p.textContent = text; });
+      d.onState(({state}) => { dictOn = state==='listening'; const b = document.getElementById('micb'); if(b) b.classList.toggle('live', dictOn); });
+      if(CI) renderSheet();
+    }).catch(()=>{});
+  }
+}catch(e){}
+
+/* ===== שגרה רכה: הצעות יומיות מתחלפות ===== */
+const hash = s => { let h = 0; for(const c of s) h = (h*31 + c.charCodeAt(0)) >>> 0; return h; };
+const routPool = slot => [...ROUT[slot], ...S.bank.routine.filter(x=>x.slot===slot).map(x=>x.t)];
+function routToday(slot){
+  const d = dk(), day = (S.routine.sug[d] ||= {});
+  if(!day[slot]){
+    const pool = routPool(slot);
+    const recent = new Set(Object.keys(S.routine.sug).filter(k=>k<d).sort().slice(-6).map(k => S.routine.sug[k][slot] && S.routine.sug[k][slot].t));
+    const cand = pool.filter(t => !recent.has(t)), arr = cand.length ? cand : pool;
+    day[slot] = {t: arr[hash(d+slot) % arr.length], done:false};
+  }
+  return day[slot];
+}
+function triedMark(t, on){
+  const d = dk(), r = S.routine.tried.find(x=>x.t===t);
+  if(on){ if(r){ r.n++; r.last = d; } else S.routine.tried.push({t, n:1, last:d}); }
+  else if(r){ r.n--; if(r.n<=0) S.routine.tried = S.routine.tried.filter(x=>x!==r); }
+}
+
+/* ===== תצוגות ===== */
+const dayEntry = d => { const e = (S.journal[d] ||= {good:[''],hard:[''],learned:[''],want:[''],free:''}); J_SECS.forEach(s => { if(!Array.isArray(e[s.k])) e[s.k] = ['']; }); if(typeof e.free!=='string') e.free=''; return e; };
+const hasText = e => e && ((e.free||'').trim() || J_SECS.some(s => cnt(e[s.k]) > 0));
+let moneyNote = '', editId = '', wmode = 'write', sumP = 'week', sumOff = 0, choreEvery = 0, choreSug = null, surpriseTag = '';
+
+function monster(k, sz){
+  sz = sz || 44;
+  const m = MOODS.find(x=>x.k===k);
+  if(!m) return `<svg viewBox="0 0 100 100" width="${sz}" height="${sz}" aria-hidden="true"><circle cx="50" cy="52" r="34" fill="none" stroke="var(--line)" stroke-width="4" stroke-dasharray="5 7"/></svg>`;
+  const c = m.c, ink = '#3b2b20';
+  let fur = '';
+  for(let i=0;i<14;i++){ const a = i/14*Math.PI*2; fur += `<circle cx="${(50+34*Math.cos(a)).toFixed(1)}" cy="${(53+32*Math.sin(a)).toFixed(1)}" r="11" fill="${c}"/>`; }
+  fur += `<circle cx="50" cy="53" r="36" fill="${c}"/>`;
+  const eye = (x,y,r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#fff"/><circle cx="${x+(k==='heavy'?0:0)}" cy="${y+(k==='heavy'?2:0)}" r="${r/2}" fill="${ink}"/>`;
+  let face = '';
+  if(k==='calm') face = `<path d="M31 49 q7 7 14 0 M55 49 q7 7 14 0" stroke="${ink}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M40 63 q10 9 20 0" stroke="${ink}" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  else if(k==='ok') face = eye(38,50,6)+eye(62,50,6)+`<path d="M42 67 h16" stroke="${ink}" stroke-width="3" stroke-linecap="round"/>`;
+  else if(k==='heavy') face = eye(38,52,6)+eye(62,52,6)+`<path d="M30 42 L45 46 M70 42 L55 46" stroke="${ink}" stroke-width="3" stroke-linecap="round"/><path d="M41 70 q9 -8 18 0" stroke="${ink}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M36 60 q-4 7 0 9 q4 -2 0 -9z" fill="#bfe3ff"/>`;
+  else if(k==='stress') face = eye(38,50,7)+eye(62,50,7)+`<path d="M37 68 q4 -5 8 0 t8 0 t8 0" stroke="${ink}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M80 30 q-5 8 0 11 q5 -3 0 -11z" fill="#bfe3ff"/>`;
+  else if(k==='angry') face = eye(38,52,6)+eye(62,52,6)+`<path d="M29 40 L46 48 M71 40 L54 48" stroke="${ink}" stroke-width="4" stroke-linecap="round"/><path d="M40 71 q10 -9 20 0" stroke="${ink}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M26 28 l6 10 l-10 -2z M74 28 l-6 10 l10 -2z" fill="${c}" stroke="${ink}" stroke-width="1.5"/>`;
+  else face = `<circle cx="38" cy="49" r="7" fill="#fff"/><circle cx="62" cy="49" r="7" fill="#fff"/><circle cx="39" cy="48" r="3.5" fill="${ink}"/><circle cx="63" cy="48" r="3.5" fill="${ink}"/><path d="M37 61 q13 20 26 0 z" fill="${ink}"/><path d="M44 69 q6 5 12 0" stroke="#e88" stroke-width="3" fill="none"/><path d="M82 24 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2z" fill="#fff6c9"/>`;
+  const cheeks = k==='angry' ? '' : `<circle cx="28" cy="62" r="5" fill="#ff9aa8" opacity=".5"/><circle cx="72" cy="62" r="5" fill="#ff9aa8" opacity=".5"/>`;
+  return `<svg viewBox="0 0 100 100" width="${sz}" height="${sz}" role="img" aria-label="${m.l}">${fur}${cheeks}${face}</svg>`;
+}
+
+function planList(date){
+  const items = S.plan[date] || [];
+  return items.map(it => {
+    if(editId===it.id) return `<div class="row" style="margin:6px 0"><input type="text" id="pe" value="${esc(it.t.replace(/^[^\p{L}\p{N}]+/u,''))}"><button class="btn small" data-a="psave" data-d="${date}" data-id="${it.id}">✓</button></div>`;
+    return `<div class="item"><button class="check ${it.done?'on':''}" data-a="ptoggle" data-d="${date}" data-id="${it.id}">${it.done?'✓':''}</button>
+    <span class="grow ${it.done?'done-t':''}">${esc(it.t)}</span>
+    ${it.kind==='workout'&&it.g&&!it.done?`<button class="btn small soft" data-a="wstart" data-g="${it.g}">להתחיל</button>`:''}
+    <button class="x" data-a="pedit" data-id="${it.id}" aria-label="עריכה">✏️</button>
+    <button class="x" data-a="preroll" data-d="${date}" data-id="${it.id}" aria-label="רעיון אחר">🎲</button>
+    <button class="x" data-a="pdel" data-d="${date}" data-id="${it.id}" aria-label="מחיקה">×</button></div>`;
+  }).join('');
+}
+
+function home(){
+  const h = new Date().getHours();
+  const g = h<5?'לילה טוב':h<12?'בוקר טוב':h<17?'צהריים טובים':h<21?'ערב טוב':'לילה טוב';
+  const d = dk(), items = S.routine.items, done = S.routine.done[d] || [];
+  const m = MOODS.find(x => x.k === S.mood[d]);
+  const wrote = hasText(S.journal[d]);
+  const dateStr = new Date().toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'});
+  const slots = [['morning','🌅 בוקר'],['day','☀️ במהלך היום'],['evening','🌙 ערב']];
+  const sug = {}; slots.forEach(([k]) => sug[k] = routToday(k));
+  const total = items.length + 3, dn = items.filter(i=>done.includes(i.id)).length + slots.filter(([k])=>sug[k].done).length;
+  const pct = Math.round(dn/total*100);
+  let week = 0; for(let i=0;i<7;i++){ week += (S.meTime[dk(addDays(new Date(),-i))]||[]).length; }
+  const tried = S.routine.tried.slice().sort((a,b)=>b.n-a.n);
+  return `
+  <div class="row"><div class="grow"><p class="sub">${dateStr}</p><h1>${g}${S.name?', '+esc(S.name):''} ☁️</h1></div>
+    ${SHOW_LETTER?`<button class="btn soft icon" data-a="letter" aria-label="המכתב">💌</button>`:''}</div>
+  ${(store.ls===false && store.idb===false)?`<div class="card" style="border:2px solid var(--terra)"><h3>⚠️ הנתונים לא נשמרים</h3><p>הדפדפן חוסם שמירה במצב הזה. בדקי שלא פתוח במצב גלישה פרטית, ושהאפליקציה נפתחת מהאייקון במסך הבית או מ-Safari, ולא מתוך וואטסאפ.</p></div>`:''}
+  ${S.name?'':`<div class="card"><h3>איך לקרוא לך?</h3><div class="row"><input type="text" id="nm" placeholder="השם שלך"><button class="btn" data-a="name">שמירה</button></div></div>`}
+  <div class="card">
+    <h3>איך מרגישה עכשיו?</h3>
+    <div class="moods">${MOODS.map(x=>`<button class="mood ${m&&m.k===x.k?'on':''}" data-a="mood" data-k="${x.k}">${monster(x.k,46)}${x.l}</button>`).join('')}</div>
+    ${m?`<p style="margin-top:12px">${m.s}</p>
+      ${m.k==='stress'?`<div class="breath"><div></div><span class="sub">שאיפה איטית… ונשיפה ארוכה…</span></div>`:''}
+      <div class="row wrap" style="margin-top:6px">
+        ${['heavy','stress','ok','angry'].includes(m.k)?`<button class="btn small" data-a="ci-open" data-m="day">לספר מה עובר עלי</button>`:`<button class="btn small" data-a="tab" data-tab="work">לאימון</button>`}
+        <button class="btn small soft" data-a="tosum">הסיכום שלי 🧸</button>
+      </div>`:`<div style="margin-top:8px"><button class="btn small ghost" data-a="tosum">הסיכום שלי 🧸</button></div>`}
+  </div>
+  ${todayWorkNoEntry()?`<div class="card sage"><h3>איך היה היום בעבודה?</h3>${earnForm(dk())}<button class="btn small ghost" style="margin-top:8px" data-a="eskip" data-d="${dk()}">לא עבדתי היום</button></div>`:''}
+  <div class="card warm">
+    <h3>⏱️ דקה איתי</h3>
+    <p style="opacity:.85;font-size:15px">לדבר או לכתוב חופשי. הכול נשמר ביומן שלך, במקום אחד.</p>
+    <div class="row wrap" style="margin-top:8px">
+      <button class="btn small" data-a="ci-open" data-m="day">לספר על היום</button>
+      <button class="btn small ghost" data-a="wplan">איך נראה השבוע שלך?</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="row"><h3 class="grow">שגרה רכה</h3><span class="sub">${dn} מתוך ${total}</span></div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <p class="sub" style="margin:6px 0 0">כל יום הצעות חדשות. 🎲 להחליף, 📌 לשמור כקבוע.</p>
+    ${slots.map(([k,l])=>`
+      <div class="slot">${l}</div>
+      <div class="item"><button class="check ${sug[k].done?'on':''}" data-a="rsdone" data-slot="${k}">${sug[k].done?'✓':''}</button>
+        <span class="grow ${sug[k].done?'done-t':''}">${esc(sug[k].t)}</span>
+        <button class="x" data-a="rswap" data-slot="${k}" aria-label="להחליף">🎲</button>
+        <button class="x" data-a="rpin" data-slot="${k}" aria-label="לשמור כקבוע">📌</button></div>
+      ${items.filter(i=>i.slot===k).map(i=>`
+        <div class="item"><button class="check ${done.includes(i.id)?'on':''}" data-a="rtoggle" data-id="${i.id}">${done.includes(i.id)?'✓':''}</button>
+        <span class="grow ${done.includes(i.id)?'done-t':''}">📌 ${esc(i.t)}</span>
+        <button class="x" data-a="rdel" data-id="${i.id}" aria-label="מחיקה">×</button></div>`).join('')}
+      <div class="row" style="margin-top:6px"><input type="text" id="ri-${k}" placeholder="הרגל משלי (נכנס גם לבנק ההצעות)…"><button class="btn small" data-a="radd" data-slot="${k}">+</button></div>
+    `).join('')}
+    ${tried.length?`<details style="margin-top:10px"><summary>הרגלים שהתחלתי (${tried.length})</summary>
+      ${tried.map((r,i)=>`<div class="item"><span class="grow">${esc(r.t)} <span class="tag t2">${r.n} פעמים</span></span><button class="chip" style="margin:0" data-a="rpin2" data-i="${S.routine.tried.indexOf(r)}">📌 קבוע</button></div>`).join('')}</details>`:''}
+  </div>
+  <div class="card sage">
+    <h3>💜 זמן איכות עם עצמי 🫂</h3>
+    ${idea?`<p style="font-size:19px;margin:10px 0"><b>${esc(idea)}</b></p>
+      <div class="row wrap"><button class="btn small" data-a="idea-do">עשיתי / עושה עכשיו 🤍</button><button class="btn small ghost" data-a="idea">עוד רעיון</button></div>`
+      :`<button class="btn small" style="margin-top:6px" data-a="idea">בחרי לי משהו נעים</button>`}
+    <p style="margin:14px 0 4px;font-size:14px"><b>הרעיון שלי</b> <span class="sub" style="color:inherit;opacity:.8">נכנס לבנק, ויופיע בהצעות הבאות</span></p>
+    <div class="row"><input type="text" id="mi" placeholder="משהו שעושה לי טוב…"><button class="btn small" data-a="meadd">+</button></div>
+    ${S.bank.me.length?`<details style="margin-top:6px"><summary>הרעיונות שלי (${S.bank.me.length})</summary>${S.bank.me.map((x,i)=>`<div class="item"><span class="grow">${esc(x)}</span><button class="x" data-a="medel" data-i="${i}">×</button></div>`).join('')}</details>`:''}
+    <p class="sub" style="margin-top:10px;color:inherit;opacity:.8">רגעים עם עצמי ב-7 הימים האחרונים: <b>${week}</b></p>
+  </div>
+  <div class="card warm">
+    <h3>${wrote?'כתבת היום 🌷':'כתיבה קצרה לפני סוף היום?'}</h3>
+    <p style="opacity:.85;font-size:15px">${wrote?'כל הכבוד על הזמן שהקדשת לעצמך.':'3 דברים טובים, או סתם מה שיושב בראש.'}</p>
+    <button class="btn small" style="margin-top:8px" data-a="tab" data-tab="write">ליומן</button>
+  </div>
+  <p class="sub center" id="sv" style="margin:14px 0 0">${statusText()}</p>
+  <details class="card"><summary>שמירה וגיבוי</summary>
+    <p class="sub">הכול נשמר רק בטלפון הזה, ואף אחד אחר לא רואה את מה שכתבת. כדי לא לאבד, אפשר להעתיק גיבוי ולשמור אותו למשל בהערות.</p>
+    <div class="row wrap"><button class="btn small soft" data-a="bshare">שיתוף גיבוי (לשמור בהערות או בקבצים)</button><button class="btn small ghost" data-a="backup">העתקה</button></div>
+    <textarea id="restore" placeholder="לשחזור: הדביקי כאן גיבוי" style="margin-top:8px;min-height:60px"></textarea>
+    <button class="btn small ghost" style="margin-top:6px" data-a="restore">שחזור</button>
+  </details>`;
+}
+
+function weekV(){
+  const ws = weekStart(wOff), key = dk(ws), cfg = S.weeks[key];
+  const range = fmtD(ws)+' – '+fmtD(addDays(ws,6));
+  const nav = `<div class="row" style="margin:12px 0">
+    <button class="btn small soft" data-a="woff" data-o="-1" ${wOff<=-1?'disabled':''}>‹ קודם</button>
+    <b class="grow center">${wOff===0?'השבוע':wOff===1?'שבוע הבא':wOff===-1?'שבוע שעבר':'בעוד '+wOff+' שבועות'} · ${range}</b>
+    <button class="btn small soft" data-a="woff" data-o="1" ${wOff>=3?'disabled':''}>הבא ›</button></div>`;
+  let body = '';
+  if(!cfg){
+    body = `<div class="card"><h3>איך נראה השבוע שלך?</h3><p class="sub">באילו ימים את עובדת? אחר כך נבחר משמרת בוקר, ערב או כפולה, ונראה מתי יש זמן.</p>
+      <div style="margin-top:8px">${DAYS.map((n,i)=>`<button class="chip ${WT.includes(i)?'on':''}" data-a="wt" data-n="${i}">${n}</button>`).join('')}</div>
+      <div class="row wrap" style="margin-top:6px"><button class="btn" data-a="wsave">להמשיך</button></div></div>`;
+  } else {
+    const dates = weekDates(ws), freeDays = dates.filter(d=>!cfg.work.includes(pd(d).getDay()));
+    const windows = dates.filter(d=>{ const s=shiftOf(cfg,d); return cfg.work.includes(pd(d).getDay()) && (s==='morning'||s==='evening'); });
+    const upcomingFree = freeDays.filter(d => pd(d) >= addDays(new Date(),-1));
+    body = `<div class="card ${upcomingFree.length||windows.length?'sage':''}">
+      ${freeDays.length?`<h3>יש לך ${freeDays.length===1?'יום פנוי אחד':freeDays.length+' ימים פנויים'} 🌿</h3>
+        <p>${freeDays.map(d=>DAYS[pd(d).getDay()]).join(', ')}.${windows.length?' ועוד חלונות בימי עבודה: '+windows.map(d=>DAYS[pd(d).getDay()]+' '+(shiftOf(cfg,d)==='morning'?'בערב':'בבוקר')).join(', ')+'.':''} מה תרצי לעשות? אימון, תחביב, מטלה, זמן עם עצמי או ביחד?</p>`
+      :`<h3>שבוע עמוס, ימי עבודה כל הימים 💼</h3><p>${windows.length?'יש חלונות קטנים: '+windows.map(d=>DAYS[pd(d).getDay()]+' '+(shiftOf(cfg,d)==='morning'?'בערב':'בבוקר')).join(', ')+'.':'גם ככה אפשר למצוא רגע קטן: 10 דקות אחרי העבודה שהן רק שלך.'}</p>`}
+      <div class="row wrap" style="margin-top:8px"><button class="btn small" data-a="wsuggest">הציעי לי תוכנית</button><button class="btn small ghost" data-a="wedit">שינוי ימי עבודה</button></div>
+    </div>
+    ${dates.map(d=>{
+      const dt = pd(d), isT = d===dk(), work = cfg.work.includes(dt.getDay()), sh = shiftOf(cfg,d);
+      return `<div class="card ${isT?'today':''}"><div class="dayhead"><b class="grow">יום ${DAYS[dt.getDay()]} · ${fmtD(dt)}${isT?' (היום)':''}</b>
+        <span class="dtag ${work?'work':'free'}">${work?'💼 עבודה':'🌿 פנוי'}</span>
+        ${work&&d<=dk()?(S.money.earn[d]?`<span class="tag t2">${fm(S.money.earn[d].amt)}</span>`:`<button class="chip" style="margin:0;font-size:12px" data-a="egoto" data-d="${d}">כמה הרווחת?</button>`):''}</div>
+        ${work?`<div style="margin:6px 0">${Object.entries(SHIFTS).map(([k,s])=>`<button class="chip ${sh===k?'on':''}" style="margin:0 0 6px 6px;font-size:13px" data-a="shift" data-d="${d}" data-k="${k}">${s.l} <span class="sub">${s.h}</span></button>`).join('')}
+          ${sh?`<p class="sub" style="margin:2px 0 0">🌿 ${SHIFTS[sh].free}</p>`:`<p class="sub" style="margin:2px 0 0">באיזו משמרת? ככה אראה מתי יש זמן פנוי.</p>`}</div>`:''}
+        ${planList(d)}
+        <div class="addrow">
+          <button class="chip" data-a="padd" data-d="${d}" data-k="workout">💪 אימון</button>
+          <button class="chip" data-a="padd" data-d="${d}" data-k="hobby">🎨 תחביב</button>
+          <button class="chip" data-a="padd" data-d="${d}" data-k="chore">🧹 מטלה</button>
+          <button class="chip" data-a="padd" data-d="${d}" data-k="me">☕ לעצמי</button>
+          <button class="chip" data-a="padd" data-d="${d}" data-k="wish">✨ ממה שבא לי</button>
+          <button class="chip" data-a="padd" data-d="${d}" data-k="together">💞 ביחד</button>
+          <button class="chip" data-a="padd" data-d="${d}" data-k="rest">😴 מנוחה</button>
+        </div>
+        <div class="row" style="margin-top:8px"><input type="text" id="pc-${d}" placeholder="משהו משלי… (נשמר לבנק ההצעות)"><button class="btn small" data-a="pcustom" data-d="${d}">+</button></div></div>`;}).join('')}`;
+  }
+  return `<h1>השבוע שלי</h1><p class="sub">לראות איפה יש זמן, ולשים בו דברים שאני באמת רוצה. ✏️ לערוך, 🎲 רעיון אחר.</p>${nav}${body}`;
+}
+
+function workV(){
+  const wo = S.workout;
+  if(W) return runnerV();
+  if(!wo.fit) return `<h1>המסלול שלי 💪</h1><p class="sub">אימונים קצרים בבית, כמו משחק: 30 שלבים בכל תחום.</p>
+    <div class="card"><h3>איזו רמת כושר מרגישה לך הכי נכונה היום?</h3>
+      <p class="sub">זה רק נקודת פתיחה. המסלול יסתגל אלייך לפי איך שהאימונים מרגישים.</p>
+      <div style="margin-top:10px">${Object.entries(FIT_NAMES).map(([k,n])=>`<button class="chip" data-a="fit" data-k="${k}">${n}</button>`).join('')}</div></div>`;
+  const sd = sportDates(), wk0 = weekStart(0), wkDays = weekDates(wk0).filter(d=>sd.has(d)).length;
+  const likes = Object.keys(wo.like), dis = Object.keys(wo.dislike);
+  return `<h1>המסלול שלי 💪</h1>
+  <p class="sub">רמה: ${FIT_NAMES[wo.fit]} · ${sd.size} ימי ספורט בסך הכול · השבוע ${wkDays}</p>
+  <div class="hint">כדי לאזן את הגוף, אי אפשר להתקדם יותר מ-${MAX_GAP} שלבים לפני שאר הקבוצות. כל שלב חמישי הוא בוס 👑 שמשלב את 4 השלבים שלפניו. אם משהו כואב, עוצרים.</div>
+  ${GROUPS.map(g=>{
+    const d = wo.done[g.k], li = lockInfo(g.k), lk = li.length>0, fin = d>=MAXST, base = clamp(d-2, 0, MAXST-6);
+    const nodes = Array.from({length:6},(_,i)=>{ const s = base+i+1, b = isBossSt(s); const cls = s<=d?'done':s===d+1?('cur'+(lk?' lock':'')):'lock'; return `<div class="node ${cls}">${s<=d?(b?'👑':'✓'):s===d+1&&lk?'🔒':b?'👑':s}</div>`; }).join('<i class="ln"></i>');
+    const nb = isBossSt(d+1);
+    return `<div class="card gcard ${lk?'locked':''}"><div class="row"><h2 class="grow">${g.e} ${g.n}</h2><span class="tag t2">${d} מתוך ${MAXST}</span></div>
+      <div class="path">${nodes}</div>
+      ${fin?`<p>🏆 סיימת את כל השלבים כאן!</p>`
+        :lk?`<p class="sub">🔒 שלב ${d+1} ייפתח אחרי אימון ב: <b>${li.map(x=>x.n).join(', ')}</b></p>`
+        :`<button class="btn" style="margin-top:6px" data-a="wstart" data-g="${g.k}">${nb?'👑 לצאת לקרב: שלב '+(d+1):'להתחיל שלב '+(d+1)}</button>`}
+    </div>`;}).join('')}
+  <div class="card sage"><h3>עשיתי תנועה אחרת 🏃‍♀️</h3>
+    <p style="opacity:.85;font-size:15px;margin:0 0 6px">פילאטיס, ריצה, קיקבוקסינג, סטודיו או כל ספורט אחר. נחשב כיום ספורט, גם אם זה לא מהמסלול.</p>
+    <div>${EXT_TYPES.map(t=>`<button class="chip ${extSel===t?'on':''}" data-a="extsel" data-t="${esc(t)}">${t}</button>`).join('')}</div>
+    <div class="row"><input type="text" id="ext-t" placeholder="או משהו אחר…" value="${extSel&&!EXT_TYPES.includes(extSel)?esc(extSel):''}"><button class="btn small" data-a="extadd">נרשם</button></div>
+    ${wo.ext.length?`<div style="margin-top:8px">${wo.ext.slice(-4).reverse().map(x=>`<div class="item"><span class="grow">${esc(x.t)} · ${fmtD(pd(x.d))}</span><button class="x" data-a="extdel" data-id="${x.id}">×</button></div>`).join('')}</div>`:''}
+  </div>
+  ${likes.length||dis.length?`<details class="card"><summary>התרגילים שסימנתי</summary>
+    ${likes.map(n=>`<div class="item"><span class="grow">👍 ${esc(n)}</span><button class="x" data-a="prefdel" data-k="like" data-n="${esc(n)}">×</button></div>`).join('')}
+    ${dis.map(n=>`<div class="item"><span class="grow">👎 ${esc(n)}</span><button class="x" data-a="prefdel" data-k="dislike" data-n="${esc(n)}">×</button></div>`).join('')}
+    <p class="sub">תרגילים שאהבתי יופיעו יותר, ולא אהובים לא יוצעו.</p></details>`:''}
+  <details class="card"><summary>שינוי רמת כושר</summary>
+    <div style="margin-top:8px">${Object.entries(FIT_NAMES).map(([k,n])=>`<button class="chip ${wo.fit===k?'on':''}" data-a="fit" data-k="${k}">${n}</button>`).join('')}</div></details>`;
+}
+function runnerV(){
+  if(W.res) return `<div class="card warm center"><div class="big">🎉</div><h2>כל הכבוד!</h2>${W.res.map(m=>`<p>${m}</p>`).join('')}
+    <button class="btn" style="margin-top:12px" data-a="wclose">חזרה למסלול</button></div>`;
+  const left = W.checks.flat().filter(c=>!c).length;
+  if(W.fin) return `<div class="card"><h2>איך זה הרגיש?</h2><p class="sub">ככה אתאים את האימון הבא אלייך.</p>
+    <div class="row wrap" style="margin-top:10px"><button class="btn soft" data-a="wfb" data-q="easy">קל מדי</button><button class="btn soft" data-a="wfb" data-q="ok">בדיוק מתאים</button><button class="btn soft" data-a="wfb" data-q="hard">קשה לי</button></div></div>`;
+  return `<div class="row"><button class="btn small soft" data-a="wclose">‹ חזרה</button></div>
+  <h1 style="margin-top:10px">${W.title}</h1>
+  <p class="sub">שלב ${W.stage}${W.boss?' · בוס: מחבר את 4 השלבים הקודמים, מעט אינטנסיבי יותר':''} · קודם 2 דקות של חימום: סיבובי כתפיים וצעידה במקום.</p>
+  <div class="card">${W.list.map((x,i)=>`<div class="ex"><b>${i+1}. ${esc(x.n)}</b> <span class="tag">${x.sets} סטים × ${fmtEx(x)}</span>
+    <p class="sub">${esc(x.tip)}</p>
+    ${figHTML(x.n)}
+    <div class="row wrap" style="margin-top:6px">${W.checks[i].map((c,j)=>`<button class="check big ${c?'on':''}" data-a="wset" data-i="${i}" data-j="${j}">${c?'✓':j+1}</button>`).join('')}
+    ${x.type==='t'?`<button class="btn small soft" data-a="wtimer" data-i="${i}" data-s="${x.v}">⏱️ טיימר <span id="tm-${i}">${x.v}</span></button>`:''}</div>
+    <div class="row wrap" style="margin-top:6px">
+      <button class="chip ${S.workout.like[x.n]?'on':''}" style="margin:0" data-a="wlike" data-i="${i}">👍 אהבתי</button>
+      <button class="chip" style="margin:0" data-a="wswap" data-i="${i}">🔄 להחליף</button>
+      <button class="chip" style="margin:0" data-a="wdis" data-i="${i}">👎 לא בשבילי</button></div></div>`).join('')}</div>
+  <button class="btn" style="width:100%" data-a="wfinish" ${left?'disabled':''}>${left?'עוד '+left+' סטים':'סיימתי! 🎉'}</button>
+  <p class="sub center" style="margin-top:8px">מנוחה של 30-60 שניות בין סטים. אפשר גם לעצור באמצע.</p>`;
+}
+
+function hobby(){
+  const have = new Set(S.hobbies.map(h=>h.t));
+  const lib = (arr,tog) => arr.filter(x=>!have.has(x)).map(x=>`<button class="chip" data-a="hlib" data-t="${esc(x)}" data-tog="${tog}">+ ${esc(x)}</button>`).join('');
+  const hearts = h => `<span class="hearts">${[1,2,3,4,5].map(n=>`<button class="${h.rating>=n?'on':''}" data-a="hrate" data-id="${h.id}" data-n="${n}">${h.rating>=n?'💛':'🤍'}</button>`).join('')}</span>`;
+  const favs = S.hobbies.filter(h=>h.status==='tried' && h.rating>=4);
+  return `
+  <h1>תחביבים</h1><p class="sub">לגלות מה עושה לי טוב, לבד וביחד.</p>
+  <div class="card warm">
+    <h3>רוצה להפתיע אותך?</h3>
+    ${surprise?`<p style="font-size:19px;margin:8px 0"><b>${esc(surprise)}</b></p>${surpriseTag?`<p class="sub" style="color:inherit;opacity:.8;margin:0 0 6px">${surpriseTag}</p>`:''}`:''}
+    <button class="btn small" data-a="hsurprise">${surprise?'עוד אחד':'הפתיעי אותי'}</button>
+    ${surprise&&!have.has(surprise)?` <button class="btn small ghost" data-a="hlib" data-t="${esc(surprise)}" data-tog="0">רוצה לנסות</button>`:''}
+  </div>
+  ${favs.length?`<div class="card"><h3>💛 המועדפים שלי</h3><div class="bank">${favs.map(h=>`<div class="bk">${esc(h.t)}<small>${h.td?'ניסיתי ב-'+fmtD(pd(h.td)):''}</small></div>`).join('')}</div></div>`:''}
+  <div class="card">
+    <h3>התחביבים שלי</h3>
+    ${S.hobbies.length?S.hobbies.map(h=>`
+      <div class="item" style="align-items:flex-start"><div class="grow">
+        <b>${esc(h.t)}</b>${h.together?'<span class="tag">ביחד 💞</span>':''}${h.status==='tried'&&h.td?`<span class="tag t2">ניסיתי ב-${fmtD(pd(h.td))}</span>`:''}
+        <div class="row wrap" style="margin-top:4px">
+          <button class="chip ${h.status==='want'?'on':''}" style="margin:0" data-a="hstat" data-id="${h.id}">${h.status==='want'?'רוצה לנסות':'ניסיתי'}</button>
+          ${h.status==='tried'?hearts(h):''}
+          <button class="chip" style="margin:0" data-a="htog" data-id="${h.id}">${h.together?'לבד':'ביחד?'}</button>
+        </div>
+        ${h.status==='tried'?`<div class="row" style="margin-top:6px"><input type="text" id="hnote-${h.id}" placeholder="מה אהבתי ומה למדתי על עצמי?" value="${esc(h.note||'')}"><button class="btn small soft" data-a="hnote" data-id="${h.id}">שמירה</button></div>`:''}
+        </div>
+        <button class="x" data-a="hdel" data-id="${h.id}">×</button></div>`).join('')
+      :`<p class="sub">עוד ריק, וזה בסדר. אפשר לבחור מהרעיונות למטה או להוסיף משלך.</p>`}
+    <div class="row" style="margin-top:10px"><input type="text" id="hn" placeholder="תחביב שמעניין אותי…"><button class="btn small" data-a="hadd">+</button></div>
+  </div>
+  <div class="card"><h3>רעיונות לגלות 🌿</h3>
+    <p class="sub">לבד</p><div>${lib(HOBBY_SOLO,0)||'<span class="sub">הוספת הכול!</span>'}</div>
+    <p class="sub" style="margin-top:8px">ביחד</p><div>${lib(HOBBY_TOGETHER,1)||'<span class="sub">הוספת הכול!</span>'}</div>
+  </div>
+  <div class="card sage"><h3>💛 בנק ההשראה: מה עושה לי טוב</h3>
+    <p style="opacity:.8;font-size:15px;margin:0 0 8px">כל מה שנכנס לכאן יחזור אלייך כרעיון לזמן איכות עם עצמי.</p>
+    ${S.likes.good.length?`<div class="bank">${S.likes.good.map((x,i)=>`<div class="bk">✨ ${esc(x.t)}${x.d?`<small>${fmtD(pd(x.d))}</small>`:''}<button class="x" data-a="ldel" data-k="good" data-i="${i}" aria-label="מחיקה">×</button></div>`).join('')}</div>`:'<p class="sub">עוד ריק. מה עושה לך טוב?</p>'}
+    <div class="row" style="margin-top:8px"><input type="text" id="l-good" placeholder="למשל: בוקר שקט, מוזיקה"><button class="btn small" data-a="ladd" data-k="good">+</button></div>
+  </div>
+  <div class="card lav"><h3>🪫 מה מרוקן אותי</h3>
+    <p style="opacity:.8;font-size:15px;margin:0 0 8px">לא חייבים לשמור. אם כותבים, זה כדי להכיר את הגבולות שלי.</p>
+    ${S.likes.drain.length?`<div class="bank">${S.likes.drain.map((x,i)=>`<div class="bk">${esc(x.t)}${x.d?`<small>נכתב ב-${fmtD(pd(x.d))}</small>`:''}<button class="x" data-a="ldel" data-k="drain" data-i="${i}" aria-label="מחיקה">×</button></div>`).join('')}</div>`:''}
+    <div class="row" style="margin-top:8px"><input type="text" id="l-drain" placeholder="למשל: יותר מדי אנשים"><button class="btn small" data-a="ladd" data-k="drain">+</button></div>
+  </div>`;
+}
+
+function choresCard(){
+  const sug = choreSug || (choreSug = choreSuggest(3));
+  const EV = [[0,'פעם אחת'],[7,'כל שבוע'],[30,'כל חודש'],[90,'כל 3 חודשים']];
+  return `<div class="card sage"><h3>🧹 מטלות</h3>
+    <p style="opacity:.85;font-size:15px;margin:0 0 8px">מה צריך לעשות, ומה כבר מזמן לא. אפשר להוסיף גם למתכנן השבועי.</p>
+    ${S.chores.map(c=>{ const ds = daysSince(c.last), due = !c.last || ds>=c.every; return `<div class="item"><button class="check" data-a="cdone" data-id="${c.id}"></button><span class="grow">${esc(c.t)} <span class="sub">${c.every?(c.last?'לפני '+ds+' ימים':'עוד לא נעשה'):'חד-פעמי'}</span>${due?' <span class="tag">הגיע הזמן</span>':''}</span><button class="x" data-a="cdel" data-id="${c.id}">×</button></div>`; }).join('')}
+    <div class="row" style="margin-top:8px"><input type="text" id="cn" placeholder="מטלה חדשה…"><button class="btn small" data-a="cadd">+</button></div>
+    <div style="margin-top:6px">${EV.map(([n,l])=>`<button class="chip ${choreEvery===n?'on':''}" data-a="cevery" data-n="${n}">${l}</button>`).join('')}</div>
+    <p style="margin:12px 0 4px"><b>הצעות להיום</b> <span class="sub" style="color:inherit;opacity:.75">כולל דברים שנזכרים רק פעם ב…</span></p>
+    ${sug.map((c,i)=>`<div class="item"><span class="grow">${esc(c.t)}${c.ds<9999?` <span class="sub">לפני ${c.ds} ימים</span>`:''}</span><button class="chip" style="margin:0" data-a="csdone" data-i="${i}">עשיתי ✓</button>${c.mine?'':`<button class="chip" style="margin:0" data-a="csadd" data-i="${i}">+ לרשימה</button>`}</div>`).join('')||'<p class="sub">הכול נקי כרגע 🌟</p>'}
+    <button class="btn small ghost" style="margin-top:6px" data-a="csug">הצעות אחרות</button>
+  </div>`;
+}
+
+function goals(){
+  return `
+  <h1>מטרות ומטלות</h1><p class="sub">חלום גדול, צעד קטן וספציפי. קטן זה מתקדם.</p>
+  <div class="card">
+    <h3>מה בא לי להשיג?</h3>
+    <div class="row"><input type="text" id="gn" placeholder="למשל: להיות בכושר"><button class="btn small" data-a="gadd">+</button></div>
+    <div style="margin-top:8px">${GOAL_CHIPS.map(c=>`<button class="chip" data-a="gchip" data-t="${esc(c)}">${esc(c)}</button>`).join('')}</div>
+  </div>
+  ${S.goals.map(g=>{
+    const dn = g.steps.filter(s=>s.done).length, all = g.steps.length && dn===g.steps.length;
+    return `<div class="card">
+      <div class="row"><h2 class="grow">🌱 ${esc(g.t)}</h2><button class="x" data-a="gdel" data-id="${g.id}">×</button></div>
+      ${g.steps.length?`<p class="sub">${dn} צעדים הושלמו</p>`:`<div class="hint">בואי נחליט על הצעד הראשון, הכי קטן שאפשר.</div>`}
+      ${g.steps.map(s=>`<div class="item"><button class="check ${s.done?'on':''}" data-a="stoggle" data-g="${g.id}" data-s="${s.id}">${s.done?'✓':''}</button>
+        <span class="grow ${s.done?'done-t':''}">${esc(s.t)}</span><button class="x" data-a="sdel" data-g="${g.id}" data-s="${s.id}">×</button></div>`).join('')}
+      ${all?`<div class="hint" style="background:var(--sage-l);color:var(--ink)">🎉 סיימת את כל הצעדים. אפשר להעלות קצת, או פשוט ליהנות מהמקום שהגעת אליו.</div>`:''}
+      <div class="row" style="margin-top:8px"><input type="text" id="sn-${g.id}" placeholder="הצעד הבא: מה, כמה ומתי?"><button class="btn small" data-a="sadd" data-g="${g.id}">+</button></div>
+      <p class="sub" style="margin-top:6px">למשל: ״השבוע אימון בטן אחד ואימון רגליים אחד״.</p>
+    </div>`;}).join('')}
+  ${S.goals.length?'':`<div class="card center"><div class="big">🌱</div><p class="sub">עוד אין מטרות. אפשר להתחיל מאחת, ולהוסיף עוד כשמרגיש נכון.</p></div>`}
+  ${choresCard()}`;
+}
+
+/* ===== כתיבה וסיכום ===== */
+function journalV(){
+  const e = dayEntry(jdate), isToday = jdate===dk();
+  const label = isToday?'היום':pd(jdate).toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'});
+  const pr = J_PROMPTS[Math.floor(Date.now()/864e5) % J_PROMPTS.length];
+  const days = Object.keys(S.journal).filter(d=>hasText(S.journal[d])).sort().reverse().slice(0,14);
+  const month = dk().slice(0,7), c = Object.keys(S.journal).filter(d=>d.startsWith(month)&&hasText(S.journal[d])).length;
+  const rows = k => { let n = e[k].length; while(n>0 && !(e[k][n-1]||'').trim()) n--; return n+1; };
+  const wishes = S.wishes.filter(w=>!w.done), doneW = S.wishes.filter(w=>w.done);
+  return `
+  <div class="row" style="margin:12px 0">
+    <button class="btn small soft" data-a="jday" data-o="-1">‹ אחורה</button>
+    <b class="grow center">${label}</b>
+    <button class="btn small soft" data-a="jday" data-o="1" ${isToday?'disabled':''}>קדימה ›</button>
+  </div>
+  <div class="card"><div class="row"><div>${monster(S.mood[jdate],54)}</div><div class="grow"><b>איך הרגשתי ${isToday?'היום':'ביום הזה'}?</b>
+    <div style="margin-top:4px">${MOODS.map(x=>`<button class="chip ${S.mood[jdate]===x.k?'on':''}" style="margin:0 0 4px 4px;font-size:13px" data-a="jmood" data-k="${x.k}">${x.l}</button>`).join('')}</div></div></div></div>
+  <div class="card">
+    ${J_SECS.map(s=>`<div class="jsec"><h3>${s.e} ${s.t}</h3>
+      ${Array.from({length:rows(s.k)},(_,i)=>`<div class="jin"><input type="text" data-j="${s.k}.${i}" value="${esc(e[s.k][i]||'')}" placeholder="${s.ph}"></div>`).join('')}</div>`).join('')}
+    <p class="sub" style="margin-bottom:0">כל שורה אופציונלית. שורה חדשה נפתחת כשכותבים.</p>
+  </div>
+  <div class="card warm">
+    <h3>🫧 מה מסתובב לי בראש?</h3>
+    <p style="opacity:.85;font-size:15px">שאלה להיום: ${pr}</p>
+    <textarea data-j="free" id="free" placeholder="אפשר לכתוב הכול, בלי לסדר ובלי לשפוט…" style="margin-top:8px;min-height:130px">${esc(e.free)}</textarea>
+    <button class="btn small ghost" style="margin-top:8px" data-a="ci-open" data-m="day">מעדיפה לדבר ⏱️</button>
+  </div>
+  <div class="card sage"><h3>🔭 דברים שבא לי ללמוד או לבדוק</h3>
+    <p style="opacity:.85;font-size:15px;margin:0 0 8px">למשל: להתחיל חוג אוריגמי, לבדוק את הפוליסת ביטוח. נשמר בבנק, ויחזור כהצעה.</p>
+    ${wishes.map(w=>`<div class="item"><button class="check" data-a="wishdone" data-id="${w.id}"></button><span class="grow">${esc(w.t)}</span><button class="x" data-a="wishdel" data-id="${w.id}">×</button></div>`).join('')}
+    <div class="row" style="margin-top:6px"><input type="text" id="wi" placeholder="משהו שבא לי ללמוד או לבדוק…"><button class="btn small" data-a="wishadd">+</button></div>
+    ${wishes.length?`<button class="btn small ghost" style="margin-top:6px" data-a="wishpick">הציעי לי אחד</button>${wishSug?`<p style="margin:8px 0 0"><b>${esc(wishSug)}</b></p>`:''}`:''}
+    ${doneW.length?`<p class="sub" style="margin:10px 0 0">כבר עשיתי (${doneW.length}): ${doneW.map(w=>esc(w.t)).join(', ')}</p>`:''}
+  </div>
+  <div class="row wrap">
+    <button class="btn" data-a="jcopy">העתקה לשיתוף</button>
+    <span class="sub grow">לשלוח למי שנעים לי איתו</span>
+  </div>
+  <p class="sub" style="margin-top:12px">החודש כתבת ב-<b>${c}</b> ימים. כל פעם נחשבת.</p>
+  ${days.length?`<h3 style="margin-top:14px">ימים קודמים</h3><div class="j-hist">${days.map(d=>`<button class="chip ${d===jdate?'on':''}" data-a="jopen" data-d="${d}">${pd(d).toLocaleDateString('he-IL',{day:'numeric',month:'short'})}</button>`).join('')}</div>`:''}`;
+}
+let wishSug = '';
+
+function periodInfo(off){
+  if(sumP==='week'){
+    const ws = weekStart(off);
+    return {dates: weekDates(ws), label: (off===0?'השבוע':off===-1?'שבוע שעבר':'שבוע של')+' · '+fmtD(ws)+' – '+fmtD(addDays(ws,6))};
+  }
+  const t = new Date(); t.setHours(12,0,0,0); t.setDate(1); t.setMonth(t.getMonth()+off);
+  const last = new Date(t.getFullYear(), t.getMonth()+1, 0, 12), dates = [];
+  for(let d = new Date(t); d <= last; d = addDays(d,1)) dates.push(dk(d));
+  return {dates, label: t.toLocaleDateString('he-IL',{month:'long',year:'numeric'}), first:t};
+}
+function pStats(dates){
+  const set = new Set(dates), r = {moods:{}, moodDays:0, good:0, learned:0, hard:0, written:0, routine:0, me:0, shifts:0, earn:0, sport:0};
+  dates.forEach(d => {
+    const m = S.mood[d]; if(m){ r.moods[m] = (r.moods[m]||0)+1; r.moodDays++; }
+    const e = S.journal[d]; if(e){ r.good += cnt(e.good); r.learned += cnt(e.learned); r.hard += cnt(e.hard); if(hasText(e)) r.written++; }
+    r.me += (S.meTime[d]||[]).length;
+    const su = S.routine.sug[d]; if(su) r.routine += Object.values(su).filter(x=>x && x.done).length;
+    r.routine += (S.routine.done[d]||[]).length;
+    const er = S.money.earn[d]; if(er){ r.shifts++; r.earn += +er.amt||0; }
+  });
+  r.sport = [...sportDates()].filter(d=>set.has(d)).length;
+  return r;
+}
+function summaryV(){
+  const P = periodInfo(sumOff), PP = periodInfo(sumOff-1), st = pStats(P.dates), pv = pStats(PP.dates);
+  const top = Object.entries(st.moods).sort((a,b)=>b[1]-a[1])[0], tm = top && MOODS.find(x=>x.k===top[0]);
+  const rowsDef = [['🌼','דברים טובים','good'],['💡','דברים שלמדתי','learned'],['💪','ימי ספורט','sport'],['📓','ימים שכתבתי','written'],['🌿','הרגלים קטנים','routine'],['🫂','רגעים עם עצמי','me']];
+  const ups = rowsDef.filter(([,,k]) => st[k] > pv[k]);
+  const prevName = sumP==='week' ? 'השבוע הקודם' : 'החודש הקודם';
+  const delta = k => st[k]>pv[k] ? `<span class="up">↑ ${st[k]-pv[k]} יותר</span>` : st[k]<pv[k] ? `<span class="sub">${pv[k]-st[k]} פחות</span>` : `<span class="sub">כמו ${prevName}</span>`;
+  const cells = sumP==='week'
+    ? P.dates.map(d => ({d, lab:DAYS[pd(d).getDay()].slice(0,3)}))
+    : [...Array(P.first.getDay()).fill(null), ...P.dates.map(d => ({d, lab:String(pd(d).getDate())}))];
+  const grid = cells.map(c => c ? `<button class="mcell ${c.d>dk()?'fut':''}" data-a="jgo" data-d="${c.d}" ${c.d>dk()?'disabled':''}>${monster(S.mood[c.d], sumP==='week'?40:32)}<span>${c.lab}</span></button>` : '<span></span>').join('');
+  /* מגמה: 6 שבועות אחרונים */
+  const trend = Array.from({length:6},(_,i) => { const o = i-5, ws = weekStart(o), s = pStats(weekDates(ws)); return {l:fmtD(ws), sport:s.sport, good:s.good}; });
+  const mx = Math.max(1, ...trend.map(t=>Math.max(t.sport,t.good)));
+  const bars = (k,col) => `<div class="bars">${trend.map(t=>`<div class="bcol"><b>${t[k]||''}</b><i style="height:${Math.round(t[k]/mx*70)+3}px;background:${col}"></i><span>${t.l}</span></div>`).join('')}</div>`;
+  return `
+  <div class="row wrap" style="margin:8px 0">
+    <button class="chip ${sumP==='week'?'on':''}" style="margin:0" data-a="sump" data-k="week">שבוע</button>
+    <button class="chip ${sumP==='month'?'on':''}" style="margin:0" data-a="sump" data-k="month">חודש</button>
+  </div>
+  <div class="row" style="margin:8px 0">
+    <button class="btn small soft" data-a="sumo" data-o="-1">‹</button><b class="grow center">${P.label}</b><button class="btn small soft" data-a="sumo" data-o="1" ${sumOff>=0?'disabled':''}>›</button>
+  </div>
+  <div class="card warm center">
+    ${tm?`<div style="display:flex;justify-content:center">${monster(top[0],110)}</div><h2 style="margin-top:4px">${sumP==='week'?'השבוע':'החודש'} היית בעיקר ${tm.l}</h2><p class="sub" style="color:inherit;opacity:.85">${top[1]} מתוך ${st.moodDays} ימים שסימנת</p>`
+      :`<div style="display:flex;justify-content:center">${monster('',90)}</div><p>עוד לא סימנת מצב רוח בתקופה הזאת. אפשר מהבית, או בלחיצה על יום כאן.</p>`}
+  </div>
+  <div class="card"><h3>${sumP==='week'?'המפלצונים של השבוע':'בנק המפלצונים'} 🧸</h3>
+    <p class="sub" style="margin:0 0 6px">כל יום מקבל מפלצון לפי איך הרגשת. לחיצה פותחת את היומן של אותו יום.</p>
+    ${sumP==='month'?`<div class="mhead">${DAYS.map(n=>`<span>${n.slice(0,1)}</span>`).join('')}</div>`:''}
+    <div class="${sumP==='week'?'mweek':'mgrid'}">${grid}</div>
+    <div class="legend">${MOODS.map(x=>`<span>${monster(x.k,18)} ${x.l}</span>`).join('')}</div>
+  </div>
+  <div class="card"><h3>${sumP==='week'?'השבוע':'החודש'} במספרים</h3>
+    ${rowsDef.map(([e,l,k])=>`<div class="item"><span>${e}</span><span class="grow">${l}</span><b>${st[k]}</b>${delta(k)}</div>`).join('')}
+    ${st.shifts?`<div class="item"><span>💼</span><span class="grow">משמרות</span><b>${st.shifts}</b><span class="sub">${fm(st.earn)}</span></div>`:''}
+  </div>
+  <div class="card sage"><h3>🌱 הצמיחה שלי</h3>
+    <p>${ups.length?'לעומת '+prevName+', יש עלייה ב'+ups.map(([,l])=>l).join(', ')+'. זה אמיתי, וזה שלך. כל הכבוד!':st.good||st.sport||st.written?'גם תקופה יציבה היא הישג. את ממשיכה להופיע, וזה מה שמשנה.':'אין מה למדוד עכשיו, וזה בסדר. כשתרגישי, כל צעד קטן ייספר.'}</p>
+  </div>
+  <div class="card"><h3>6 שבועות אחרונים</h3>
+    <p class="sub" style="margin:0">💪 ימי ספורט בשבוע</p>${bars('sport','var(--terra)')}
+    <p class="sub" style="margin:10px 0 0">🌼 דברים טובים שכתבתי</p>${bars('good','var(--sage)')}
+  </div>`;
+}
+function write(){
+  return `<h1>הכתיבה שלי</h1><p class="sub">לא נלחמת במחשבות, רק כותבת אותן.</p>
+  <div class="row wrap" style="margin:8px 0"><button class="chip ${wmode==='write'?'on':''}" style="margin:0" data-a="wm" data-k="write">📓 כתיבה</button><button class="chip ${wmode==='sum'?'on':''}" style="margin:0" data-a="wm" data-k="sum">🧸 סיכום</button></div>
+  ${wmode==='sum'?summaryV():journalV()}`;
+}
+
+/* ===== כסף ===== */
+const fm = n => '₪' + Math.round(n).toLocaleString('he-IL');
+const HOWS = [['fun','כיפי 😄'],['sat','מספק 🙂'],['easy','קל'],['ok','בסדר'],['hard','קשה'],['bad','מבאס 😞']];
+function cyc(ref){
+  const r = ref ? new Date(ref) : new Date(); r.setHours(12,0,0,0);
+  const cd = S.money.cycleDay;
+  let s = new Date(r.getFullYear(), r.getMonth(), cd, 12);
+  if(s > r) s = new Date(r.getFullYear(), r.getMonth()-1, cd, 12);
+  return {s, e:new Date(s.getFullYear(), s.getMonth()+1, cd-1, 12), pay:new Date(s.getFullYear(), s.getMonth()+1, cd, 12)};
+}
+function cycData(){
+  const c = cyc(), sk = dk(c.s), ek = dk(c.e), today = dk(), T = pd(today);
+  const ents = Object.entries(S.money.earn).filter(([d]) => d>=sk && d<=ek).sort();
+  const total = ents.reduce((a,[,v]) => a + (+v.amt||0), 0), n = ents.length, avg = n ? total/n : 0;
+  const daysLeft = Math.max(0, Math.round((c.e - T)/864e5)), len = Math.round((c.e - c.s)/864e5) + 1;
+  let planned = 0, unknown = 0;
+  for(let i=1;i<=daysLeft;i++){ const d = addDays(T,i), cf = S.weeks[wkOf(dk(d))]; if(!cf) unknown++; else if(cf.work.includes(d.getDay())) planned++; }
+  const missing = [];
+  for(let d = new Date(c.s); dk(d) < today; d = addDays(d,1)){
+    const k = dk(d), cf = S.weeks[wkOf(k)];
+    if(cf && cf.work.includes(d.getDay()) && !S.money.earn[k] && !S.money.skip[k]) missing.push(k);
+  }
+  const spent = Object.entries(S.money.spent).filter(([d]) => d>=sk && d<=ek).reduce((a,[,l]) => a + l.reduce((x,y)=>x+(+y.amt||0),0), 0);
+  return {c, sk, ek, ents, total, n, avg, daysLeft, len, planned, unknown, missing, spent, payIn: Math.round((c.pay - T)/864e5)};
+}
+function moneyStats(){
+  const ents = Object.entries(S.money.earn); if(!ents.length) return null;
+  const total = ents.reduce((a,[,v]) => a + (+v.amt||0), 0), n = ents.length;
+  const weeks = new Set(ents.map(([d])=>wkOf(d))).size;
+  const months = {}; ents.forEach(([d,v]) => { const k = dk(cyc(pd(d)).s); months[k] = (months[k]||0) + (+v.amt||0); });
+  const mk = Object.keys(months), ds = ents.map(([d])=>d).sort();
+  const span = Math.max(1, Math.round((pd(ds[ds.length-1]) - pd(ds[0]))/864e5) + 1);
+  return {n, perShift: total/n, perWeek: total/weeks, perMonth: mk.reduce((a,k)=>a+months[k],0)/mk.length, perDay: total/span, weeks, months: mk.length};
+}
+function todayWorkNoEntry(){
+  const cf = S.weeks[wkOf(dk())]; if(!cf || !cf.work.includes(new Date().getDay())) return false;
+  return !S.money.earn[dk()] && !S.money.skip[dk()];
+}
+function howChips(){ return HOWS.map(([k,l]) => `<button class="chip ${moneyHow===k?'on':''}" data-a="ehow" data-k="${k}">${l}</button>`).join(''); }
+function earnForm(date){
+  return `<p class="sub" style="margin:0 0 6px">איך היה בעבודה?</p><div>${howChips()}</div>
+    <input type="text" id="e-note" data-nokey="1" placeholder="…מילה או שתיים על המשמרת (לא חובה)" value="${esc(moneyNote)}" style="margin:2px 0 6px">
+    <div class="row"><input type="text" inputmode="decimal" id="e-amt" placeholder="כמה הרווחתי היום (משכורת וטיפים)" value="${esc(moneyAmt)}"><button class="btn" data-a="esave" data-d="${date}">שמירה</button></div>`;
+}
+function moneyV(){
+  const m = S.money, D = cycData(), MS = moneyStats();
+  const lad = [...m.ladder].sort((a,b)=>a.min-b.min);
+  const reached = lad.filter(x=>D.total>=x.min).pop(), next = lad.find(x=>x.min>D.total);
+  const top = lad.length ? lad[lad.length-1].min : 0, pct = top ? clamp(D.total/top*100,0,100) : 0;
+  const fd = d => fmtD(d);
+  const date = moneyDate || dk();
+  let restMsg;
+  if(!D.n) restMsg = 'אחרי שתרשמי את היום הראשון, אחשב כמה זמן נשאר עד שאפשר לנוח יותר.';
+  else if(reached) restMsg = `הגעת ל-${fm(D.total)}! לפי התוכנית שלך אפשר לעבוד עד ${reached.days} ימים בשבוע, וליהנות מהשאר. 🌿` + (next ? ` עוד ${fm(next.min-D.total)} ואפשר לרדת ל-${next.days} ימים.` : '');
+  else if(next) restMsg = `עוד ${fm(next.min-D.total)} (בערך ${D.avg?Math.ceil((next.min-D.total)/D.avg):'?'} משמרות) ואפשר לרדת ל-${next.days} ימים בשבוע.`;
+  else restMsg = 'אפשר להגדיר למטה כמה כסף מרגיש לך מספיק כדי לעבוד פחות.';
+  const scen = D.avg ? [5,4,3].map(n => {
+    const p = D.total + D.avg * (D.daysLeft/7*n), hit = lad.filter(x=>p>=x.min).pop();
+    return `<div class="item"><span class="grow">${n} ימים בשבוע עד סוף המחזור</span><b>${fm(p)}</b>${hit?'<span class="tag t2">מספיק ✓</span>':''}</div>`;
+  }).join('') : '<p class="sub">אחרי כמה ימים רשומים אציג תחזית.</p>';
+  const recent = D.ents.slice().reverse().slice(0,8);
+  /* חלוקת שכר */
+  const al = m.alloc, income = m.incomeOv>0 ? m.incomeOv : D.total;
+  const fun = +al.fun||0, inv = +al.invest||0, sav = Math.max(0, income - fun - inv), over = fun + inv > income;
+  const funLeft = fun - D.spent, seg = v => income>0 ? clamp(v/income*100,0,100) : 0;
+  return `
+  <h1>הכסף שלי 💰</h1>
+  <p class="sub">מחזור ${fd(D.c.s)} – ${fd(D.c.e)} · שכר ב-${fd(D.c.pay)} (בעוד ${D.payIn} ימים)</p>
+  <div class="card warm">
+    <p class="sub" style="color:inherit;opacity:.85;margin:0">הרווחתי עד עכשיו</p>
+    <div style="font-size:38px;font-family:'Varela Round',sans-serif">${fm(D.total)}</div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <p style="font-size:14px;margin:0">${D.n} משמרות${D.n?` · ממוצע ${fm(D.avg)} למשמרת`:''}${D.planned?` · ${D.planned} משמרות מתוכננות עד סוף המחזור`:''}</p>
+  </div>
+  ${MS?`<div class="card"><h3>הממוצעים שלי 📊</h3>
+    <div class="stats"><div><b>${fm(MS.perShift)}</b><span>למשמרת</span></div><div><b>${fm(MS.perDay)}</b><span>ליום (כולל חופשיים)</span></div><div><b>${fm(MS.perWeek)}</b><span>לשבוע</span></div><div><b>${fm(MS.perMonth)}</b><span>לחודש</span></div></div>
+    <p class="sub" style="margin:8px 0 0">לפי ${MS.n} משמרות, ${MS.weeks} שבועות ו-${MS.months} מחזורי שכר.</p></div>`:''}
+  <div class="card sage"><h3>זמן לנוח?</h3><p>${restMsg}</p></div>
+  ${D.missing.length?`<div class="card"><h3>ימי עבודה שעוד לא רשמת</h3><div>${D.missing.map(k=>`<button class="chip" data-a="edate" data-d="${k}">${DAYS[pd(k).getDay()]} ${fmtD(pd(k))}</button>`).join('')}</div></div>`:''}
+  <div class="card"><h3>לרשום יום עבודה</h3>
+    <input type="date" id="e-date" value="${date}" style="margin-bottom:8px">
+    ${earnForm(date)}
+    ${date===dk()?`<button class="btn small ghost" style="margin-top:8px" data-a="eskip" data-d="${date}">לא עבדתי היום</button>`:''}
+    ${recent.length?`<div style="margin-top:10px">${recent.map(([d,v])=>`<div class="item" style="align-items:flex-start"><span class="grow">${DAYS[pd(d).getDay()]} ${fmtD(pd(d))}${v.how?` <span class="tag t2">${(HOWS.find(h=>h[0]===v.how)||[,''])[1]}</span>`:''}${v.note?`<br><span class="sub">${esc(v.note)}</span>`:''}</span><b>${fm(v.amt)}</b><button class="x" data-a="edel" data-d="${d}">×</button></div>`).join('')}</div>`:''}
+  </div>
+  <div class="card sage"><h3>לאן הכסף הולך 🧭</h3>
+    <p style="opacity:.85;font-size:15px;margin:0 0 8px">מתוך ההכנסה, אני קובעת כמה למותרות וכמה להשקעות. מה שנשאר הולך לחיסכון.</p>
+    <p class="sub" style="color:inherit;margin:0 0 4px">הכנסה לחישוב: <b>${fm(income)}</b> ${m.incomeOv>0?'(ידני)':'(מה שהרווחתי במחזור)'}</p>
+    <div class="row wrap">
+      <input type="text" inputmode="numeric" id="al-inc" placeholder="הכנסה ידנית (לא חובה)" value="${m.incomeOv||''}" style="flex:1 1 140px">
+      <input type="text" inputmode="numeric" id="al-fun" placeholder="מותרות" value="${fun||''}" style="flex:1 1 90px">
+      <input type="text" inputmode="numeric" id="al-inv" placeholder="השקעות" value="${inv||''}" style="flex:1 1 90px">
+      <input type="text" inputmode="numeric" id="al-liq" placeholder="עו״ש נזיל" value="${+al.liquid||''}" style="flex:1 1 90px">
+    </div>
+    <button class="btn small" style="margin-top:8px" data-a="alsave">שמירה</button>
+    ${over?`<p style="margin-top:8px">⚠️ המותרות וההשקעות יחד גדולים מההכנסה, אז אין מה לחסוך החודש.</p>`:''}
+    ${income>0?`<div class="split"><i style="width:${seg(fun)}%;background:var(--butter)"></i><i style="width:${seg(inv)}%;background:var(--terra)"></i><i style="width:${seg(sav)}%;background:var(--sage)"></i></div>`:''}
+    <div class="stats" style="margin-top:10px">
+      <div><b>${fm(fun)}</b><span>🎀 תקציב מותרות</span></div>
+      <div><b>${fm(inv)}</b><span>📈 השקעות</span></div>
+      <div><b>${fm(sav)}</b><span>🏦 חיסכון</span></div>
+      <div><b>${fm(+al.liquid||0)}</b><span>💧 עו״ש נזיל</span></div>
+    </div>
+    ${fun?`<p style="margin:10px 0 4px">הוצאתי מהמותרות: <b>${fm(D.spent)}</b> · נשארו <b>${fm(Math.max(0,funLeft))}</b></p>
+      <div class="row"><input type="text" inputmode="numeric" id="fs" placeholder="הוצאתי על משהו נעים"><button class="btn small soft" data-a="fspend">+</button></div>`:''}
+  </div>
+  <div class="card"><h3>אם אעבוד פחות</h3><p class="sub">תחזית לסוף המחזור לפי הממוצע שלך למשמרת.</p>${scen}</div>
+  <div class="card"><h3>כמה מספיק לי?</h3>
+    <p class="sub">כשאגיע לסכום, אפשר לעבוד פחות ימים בשבוע.</p>
+    ${lad.map((x,i)=>`<div class="item"><span class="grow">מ-<b>${fm(x.min)}</b>: עד <b>${x.days}</b> ימים בשבוע</span><button class="x" data-a="ladel" data-i="${m.ladder.indexOf(x)}">×</button></div>`).join('')}
+    <div class="row" style="margin-top:8px"><input type="text" inputmode="numeric" id="lm" placeholder="סכום"><input type="text" inputmode="numeric" id="ld" placeholder="ימים" style="max-width:90px"><button class="btn small" data-a="ladd2">+</button></div>
+  </div>
+  <p class="sub center" style="margin:12px 0">הנתונים נשמרים רק אצלך בטלפון.</p>`;
+}
+const views = {home, week:weekV, money:moneyV, work:workV, hobby, goals, write};
+
+/* ===== דקה איתי: כתיבה או דיבור שנשמרים ביומן ===== */
+function micBtn(){ return dict ? `<button class="btn mic ${dictOn?'live':''}" id="micb" data-a="ci-mic" aria-label="הקלטה">🎙️</button>` : ''; }
+function sheetHTML(){
+  if(!CI) return '';
+  const close = `<div class="row" style="margin-bottom:8px"><span class="grow"></span><button class="x" data-a="ci-close" aria-label="סגירה">×</button></div>`;
+  if(CI.saved) return close + `<div class="center"><div class="big">🤍</div><h2>נשמר ביומן שלך</h2></div>
+    <p style="margin-top:8px">הטקסט נשמר בכרטיסייה <b>כתיבה</b>, בתוך <b>״מה מסתובב לי בראש״</b>, בתאריך של היום. אפשר לחזור אליו בכל רגע, ולהוסיף עוד.</p>
+    <div class="row wrap" style="margin-top:14px"><button class="btn" data-a="ci-openj">לפתוח את היומן</button><button class="btn ghost" data-a="ci-close">סגירה</button></div>`;
+  return close + `<h2>מה עובר עלייך?</h2><p class="sub">אפשר לדבר או לכתוב חופשי. זה יישמר רק ביומן, ב״מה מסתובב לי בראש״.</p>
+    <div class="row" style="align-items:flex-start;margin-top:10px"><textarea id="cit" placeholder="היום…" style="min-height:150px">${esc(CI.text)}</textarea>${micBtn()}</div>
+    <p class="sub" id="partial" style="min-height:20px"></p>
+    ${dict?'':`<p class="sub">אפשר גם ללחוץ על המיקרופון במקלדת של הטלפון ולהכתיב.</p>`}
+    <button class="btn" style="width:100%;margin-top:8px" data-a="ci-save">לשמור ביומן</button>`;
+}
+function renderSheet(){ const s = $('#sheet'); if(!CI){ s.classList.remove('show'); return; } $('#sheet-in').innerHTML = sheetHTML(); s.classList.add('show'); }
+function ciText(){ const el = document.getElementById('cit'); return el ? el.value : (CI ? CI.text : ''); }
+function stopDict(){ try{ if(dict && dictOn) dict.stop(); }catch(e){} }
+
+/* ===== כללי ===== */
+function render(){
+  $('#view').innerHTML = views[tab]();
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('on', b.dataset.tab===tab));
+}
+function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove('show'),2600); }
+const numv = id => { const el=document.getElementById(id); const v=parseFloat((el?el.value:'').replace(/[^\d.]/g,'')); return isFinite(v) ? v : NaN; };
+function val(id){ const el=document.getElementById(id); return el ? el.value.trim() : ''; }
+async function copy(text){
+  try{ await navigator.clipboard.writeText(text); return true; }catch(e){}
+  try{ const t=document.createElement('textarea'); t.value=text; document.body.appendChild(t); t.select(); const ok=document.execCommand('copy'); t.remove(); return ok; }catch(e){ return false; }
+}
+function showLetter(){
+  $('#paper').innerHTML = `<div class="center" style="font-size:42px">💌</div><p style="margin-top:6px"><b>${LETTER_TITLE}</b></p>${LETTER_BODY.map(p=>`<p>${p}</p>`).join('')}<p class="sig">${LETTER_SIGN}</p>
+    <div class="center" style="margin-top:18px"><button class="btn" data-a="letter-close">${S.seenLetter?'חזרה':'בואי נתחיל'}</button></div>`;
+  $('#letter').classList.add('show');
+}
+
+/* ===== פעולות ===== */
+const goto = (t) => { tab = t; render(); window.scrollTo(0,0); return 0; };
+const A = {
+  tab:(d)=>{ tab=d.tab; render(); window.scrollTo(0,0); },
+  tosum:()=>{ wmode='sum'; sumP='week'; sumOff=0; goto('write'); return 0; },
+  wm:(d)=>{ wmode=d.k; },
+  sump:(d)=>{ sumP=d.k; sumOff=0; },
+  sumo:(d)=>{ sumOff = Math.min(0, sumOff + +d.o); },
+  jgo:(d)=>{ jdate=d.d; wmode='write'; },
+  jmood:(d)=>{ S.mood[jdate] = S.mood[jdate]===d.k ? '' : d.k; },
+  name:()=>{ const v=val('nm'); if(!v) return 0; S.name=v; },
+  mood:(d)=>{ S.mood[dk()]=d.k; },
+  letter:()=>{ showLetter(); return 0; },
+  'letter-close':()=>{ S.seenLetter=true; $('#letter').classList.remove('show'); save(); return 0; },
+  backup:async()=>{ const ok=await copy(JSON.stringify(S)); toast(ok?'הגיבוי הועתק. שמרי אותו במקום בטוח':'לא הצלחתי להעתיק'); return 0; },
+  bshare:async()=>{ const txt = JSON.stringify(S); try{ if(navigator.share){ await navigator.share({title:'גיבוי הפינה שלי', text:txt}); return 0; } }catch(e){ if(e && e.name==='AbortError') return 0; } const ok = await copy(txt); toast(ok?'הגיבוי הועתק. שמרי אותו במקום בטוח':'לא הצלחתי להעתיק'); return 0; },
+  restore:()=>{ const v=val('restore'); if(!v) return 0; try{ const o=JSON.parse(v); localStorage.setItem(KEY, JSON.stringify(o)); S=load(); save(true); toast('השחזור הושלם'); }catch(e){ toast('הגיבוי לא תקין'); return 0; } },
+  /* שגרה */
+  rtoggle:(d)=>{ const k=dk(), a=S.routine.done[k]||(S.routine.done[k]=[]); const i=a.indexOf(d.id); i>=0?a.splice(i,1):a.push(d.id); },
+  radd:(d)=>{ const v=val('ri-'+d.slot); if(!v) return 0; S.routine.items.push({id:uid(),t:v,slot:d.slot}); if(!S.bank.routine.some(x=>x.t===v)) S.bank.routine.push({t:v,slot:d.slot}); toast('נשמר כקבוע וגם בבנק ההצעות'); },
+  rdel:(d)=>{ S.routine.items=S.routine.items.filter(i=>i.id!==d.id); },
+  rsdone:(d)=>{ const s = routToday(d.slot); s.done = !s.done; triedMark(s.t, s.done); if(s.done) toast('התחלת הרגל קטן 🌱'); },
+  rswap:(d)=>{ const s = routToday(d.slot), pool = routPool(d.slot).filter(t=>t!==s.t); if(!pool.length) return 0; if(s.done) triedMark(s.t,false); s.t = pick(pool); s.done = false; },
+  rpin:(d)=>{ const s = routToday(d.slot); if(!S.routine.items.some(i=>i.t===s.t && i.slot===d.slot)) S.routine.items.push({id:uid(),t:s.t,slot:d.slot}); toast('נוסף לשגרה הקבועה'); },
+  rpin2:(d)=>{ const r = S.routine.tried[+d.i]; if(!r) return 0; const slot = ['morning','day','evening'].find(k=>routPool(k).includes(r.t)) || 'day'; if(!S.routine.items.some(i=>i.t===r.t)) S.routine.items.push({id:uid(),t:r.t,slot}); toast('נוסף לשגרה הקבועה'); },
+  /* זמן איכות */
+  idea:()=>{ const pool = mePool(); let n; let i=0; do{ n=pick(pool); i++; }while(n===idea && pool.length>1 && i<20); idea=n; },
+  'idea-do':()=>{ const k=dk(); (S.meTime[k]||(S.meTime[k]=[])).push(idea); idea=''; toast('כל הכבוד שנתת לעצמך את הזמן הזה 🤍'); },
+  meadd:()=>{ const v=val('mi'); if(!v) return 0; if(!S.bank.me.includes(v)) S.bank.me.push(v); idea = v; toast('נשמר בבנק. יופיע בהצעות הבאות 💜'); },
+  medel:(d)=>{ S.bank.me.splice(+d.i,1); },
+  /* תחביבים */
+  hadd:()=>{ const v=val('hn'); if(!v) return 0; S.hobbies.push({id:uid(),t:v,status:'want',rating:0,together:false}); },
+  hlib:(d)=>{ S.hobbies.push({id:uid(),t:d.t,status:'want',rating:0,together:d.tog==='1'}); toast('נוסף לרשימה'); },
+  hsurprise:()=>{
+    const have = new Set(S.hobbies.map(h=>h.t)), favs = S.hobbies.filter(h=>h.status==='tried' && h.rating>=4 && h.t!==surprise);
+    const pool = [...HOBBY_SOLO,...HOBBY_TOGETHER,...bankPlan(['hobby'])].filter(x=>!have.has(x)&&x!==surprise);
+    if(favs.length && (Math.random()<.3 || !pool.length)){ surprise = pick(favs).t; surpriseTag = 'אחד מהמועדפים שלך 💛'; }
+    else { surprise = pool.length?pick(pool):''; surpriseTag = ''; }
+  },
+  hstat:(d)=>{ const h=S.hobbies.find(x=>x.id===d.id); if(h.status==='want'){ h.status='tried'; h.td=dk(); toast('איך היה? אפשר לדרג ולכתוב מה למדת 💛'); } else h.status='want'; },
+  htog:(d)=>{ const h=S.hobbies.find(x=>x.id===d.id); h.together=!h.together; },
+  hrate:(d)=>{ const h=S.hobbies.find(x=>x.id===d.id); h.rating=(h.rating==+d.n)?0:+d.n; },
+  hnote:(d)=>{ const h=S.hobbies.find(x=>x.id===d.id); h.note = val('hnote-'+d.id); toast('נשמר'); },
+  hdel:(d)=>{ S.hobbies=S.hobbies.filter(x=>x.id!==d.id); },
+  ladd:(d)=>{ const v=val('l-'+d.k); if(!v) return 0; S.likes[d.k].unshift({t:v,d:dk()}); },
+  ldel:(d)=>{ S.likes[d.k].splice(+d.i,1); },
+  /* מטרות */
+  gchip:(d)=>{ const el=$('#gn'); if(el){ el.value=d.t; el.focus(); } return 0; },
+  gadd:()=>{ const v=val('gn'); if(!v) return 0; S.goals.unshift({id:uid(),t:v,steps:[]}); },
+  gdel:(d)=>{ S.goals=S.goals.filter(g=>g.id!==d.id); },
+  sadd:(d)=>{ const v=val('sn-'+d.g); if(!v) return 0; S.goals.find(g=>g.id===d.g).steps.push({id:uid(),t:v,done:false}); },
+  stoggle:(d)=>{ const s=S.goals.find(g=>g.id===d.g).steps.find(x=>x.id===d.s); s.done=!s.done; if(s.done) toast('כל הכבוד, צעד קטן הוא צעד 🌱'); },
+  sdel:(d)=>{ const g=S.goals.find(g=>g.id===d.g); g.steps=g.steps.filter(x=>x.id!==d.s); },
+  /* מטלות */
+  cevery:(d)=>{ choreEvery = +d.n; },
+  cadd:()=>{ const v=val('cn'); if(!v) return 0; S.chores.push({id:uid(), t:v, every:choreEvery, last:''}); choreSug=null; },
+  cdone:(d)=>{ const c=S.chores.find(x=>x.id===d.id); if(!c) return 0; markChore(c.t, dk()); choreSug=null; toast('כל הכבוד, עוד דבר שנעשה 🧹'); },
+  cdel:(d)=>{ S.chores=S.chores.filter(x=>x.id!==d.id); choreSug=null; },
+  csug:()=>{ choreSug = choreSuggest(3); },
+  csdone:(d)=>{ const c = (choreSug||[])[+d.i]; if(!c) return 0; markChore(c.t, dk()); choreSug = choreSuggest(3); toast('כל הכבוד 🧹'); },
+  csadd:(d)=>{ const c = (choreSug||[])[+d.i]; if(!c) return 0; const b = CHORE_BANK.find(x=>x[0]===c.t); S.chores.push({id:uid(), t:c.t, every:b?b[1]:30, last:S.choreDone[c.t]||''}); choreSug = choreSuggest(3); toast('נוסף לרשימה שלי'); },
+  /* כתיבה */
+  jday:(d)=>{ const x=addDays(pd(jdate), +d.o); if(x>new Date()) return 0; jdate=dk(x); },
+  jopen:(d)=>{ jdate=d.d; },
+  jcopy:async()=>{
+    const e=dayEntry(jdate); let t='📓 '+pd(jdate).toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'})+'\n';
+    J_SECS.forEach(s=>{ const l=e[s.k].filter(x=>(x||'').trim()); if(l.length) t+='\n'+s.e+' '+s.t+'\n'+l.map(x=>'• '+x).join('\n')+'\n'; });
+    if(e.free.trim()) t+='\n🫧 '+e.free.trim()+'\n';
+    const ok=await copy(t); toast(ok?'הועתק, אפשר להדביק ולשלוח':'לא הצלחתי להעתיק'); return 0;
+  },
+  wishadd:()=>{ const v=val('wi'); if(!v) return 0; S.wishes.unshift({id:uid(), t:v, d:dk(), done:false}); toast('נשמר בבנק. אציע לך אותו בהמשך ✨'); },
+  wishdone:(d)=>{ const w=S.wishes.find(x=>x.id===d.id); if(w){ w.done=true; w.dd=dk(); toast('כל הכבוד! 🎉'); } },
+  wishdel:(d)=>{ S.wishes=S.wishes.filter(x=>x.id!==d.id); },
+  wishpick:()=>{ const w=S.wishes.filter(x=>!x.done); wishSug = w.length ? pick(w).t : ''; },
+  /* שבוע */
+  wplan:()=>{ wOff = 0; WT = []; tab = 'week'; render(); window.scrollTo(0,0); return 0; },
+  woff:(d)=>{ wOff = clamp(wOff + +d.o, -1, 3); WT = []; },
+  wt:(d)=>{ const n=+d.n, i=WT.indexOf(n); i>=0?WT.splice(i,1):WT.push(n); },
+  wsave:()=>{ S.weeks[dk(weekStart(wOff))] = {work:[...WT], shift:{}}; WT=[]; },
+  wedit:()=>{ const k=dk(weekStart(wOff)); WT=[...S.weeks[k].work]; delete S.weeks[k]; },
+  shift:(d)=>{ const c = S.weeks[wkOf(d.d)]; if(!c) return 0; c.shift ||= {}; const n = pd(d.d).getDay(); c.shift[n] = c.shift[n]===d.k ? '' : d.k; },
+  wsuggest:()=>{ const n = suggestWeek(weekStart(wOff)); toast(n ? 'הצעתי תוכנית. אפשר לשנות הכול' : 'אין מקום פנוי להציע עליו'); },
+  padd:(d)=>{ addPlan(d.d, d.k); },
+  pcustom:(d)=>{ const v=val('pc-'+d.d); if(!v) return 0; (S.plan[d.d] ||= []).push({id:uid(), kind:'custom', t:'⭐ '+v, done:false}); if(!S.bank.plan.some(x=>x.t===v)) S.bank.plan.push({t:v, kind:'custom'}); toast('נוסף, ונשמר בבנק ההצעות'); },
+  pdel:(d)=>{ S.plan[d.d] = (S.plan[d.d]||[]).filter(x=>x.id!==d.id); },
+  pedit:(d)=>{ editId = d.id; },
+  psave:(d)=>{
+    const v = val('pe'); editId = ''; if(!v) return;
+    const it = (S.plan[d.d]||[]).find(x=>x.id===d.id); if(!it) return;
+    const em = (it.t.match(/^[^\p{L}\p{N}]+/u)||[''])[0];
+    it.t = em + v; if(it.kind==='workout') it.g = null;
+    const bk = ['workout','hobby','me','together'].includes(it.kind) ? it.kind : 'custom';
+    if(!S.bank.plan.some(x=>x.t===v)) S.bank.plan.push({t:v, kind:bk});
+    toast('נשמר, ויופיע בהצעות הבאות');
+  },
+  preroll:(d)=>{ const arr = S.plan[d.d]||[], i = arr.findIndex(x=>x.id===d.id); if(i<0) return; const k = arr[i].kind==='custom' ? 'me' : arr[i].kind; const n = makeItem(k, d.d); n.done = false; arr[i] = n; },
+  ptoggle:(d)=>{ const it=(S.plan[d.d]||[]).find(x=>x.id===d.id); if(it){ it.done=!it.done; if(it.done && it.c) markChore(it.c, d.d); } },
+  /* כסף */
+  ehow:(d)=>{ moneyAmt = val('e-amt') || moneyAmt; moneyNote = val('e-note') || moneyNote; moneyHow = moneyHow===d.k ? '' : d.k; },
+  edate:(d)=>{ moneyDate = d.d; moneyAmt = ''; moneyHow = ''; moneyNote = ''; },
+  egoto:(d)=>{ moneyDate = d.d; moneyAmt = ''; moneyHow = ''; moneyNote = ''; return goto('money'); },
+  esave:(d)=>{
+    const v = numv('e-amt'); if(!isFinite(v) || v<0){ toast('כתבי כמה הרווחת, גם אפס מתקבל'); return 0; }
+    S.money.earn[d.d] = {amt:v, how:moneyHow, note:(val('e-note')||moneyNote).trim()}; delete S.money.skip[d.d];
+    moneyAmt = ''; moneyHow = ''; moneyNote = ''; moneyDate = '';
+    toast('נשמר. עד עכשיו במחזור: ' + fm(cycData().total));
+  },
+  eskip:(d)=>{ S.money.skip[d.d] = true; moneyAmt=''; moneyHow=''; moneyNote=''; },
+  edel:(d)=>{ delete S.money.earn[d.d]; },
+  ladd2:()=>{ const m = numv('lm'), dd = numv('ld'); if(!isFinite(m) || !isFinite(dd) || dd<1 || dd>7){ toast('כתבי סכום ומספר ימים בין 1 ל-7'); return 0; } S.money.ladder.push({min:m, days:Math.round(dd)}); },
+  ladel:(d)=>{ S.money.ladder.splice(+d.i,1); },
+  alsave:()=>{
+    const n = id => { const v = numv(id); return isFinite(v) ? v : 0; };
+    S.money.incomeOv = n('al-inc'); S.money.alloc = {fun:n('al-fun'), invest:n('al-inv'), liquid:n('al-liq')}; toast('נשמר');
+  },
+  fspend:()=>{ const v = numv('fs'); if(!isFinite(v) || v<=0){ toast('כתבי סכום'); return 0; } (S.money.spent[dk()] ||= []).push({id:uid(), t:'מותרות', amt:v}); toast('נרשם. נשארו ' + fm(Math.max(0, S.money.alloc.fun - cycData().spent)) + ' מהמותרות'); },
+  /* אימונים */
+  fit:(d)=>{ S.workout.fit=d.k; },
+  wstart:(d)=>{ startGroup(d.g); },
+  wset:(d)=>{ W.checks[+d.i][+d.j] = !W.checks[+d.i][+d.j]; return 'r'; },
+  wlike:(d)=>{ const n = W.list[+d.i].n; if(S.workout.like[n]) delete S.workout.like[n]; else { S.workout.like[n] = true; delete S.workout.dislike[n]; toast('אציע לך אותו יותר 👍'); } },
+  wswap:(d)=>{ swapEx(+d.i, false); },
+  wdis:(d)=>{ swapEx(+d.i, true); },
+  prefdel:(d)=>{ delete S.workout[d.k][d.n]; },
+  extsel:(d)=>{ extSel = extSel===d.t ? '' : d.t; const el = document.getElementById('ext-t'); if(el) el.value=''; },
+  extadd:()=>{
+    const t = val('ext-t') || extSel; if(!t){ toast('בחרי סוג תנועה או כתבי'); return 0; }
+    S.workout.ext.push({id:uid(), d:dk(), t}); extSel = ''; markWorkoutPlan(null); toast('נרשם כיום ספורט. כל הכבוד 💪');
+  },
+  extdel:(d)=>{ S.workout.ext = S.workout.ext.filter(x=>x.id!==d.id); },
+  wtimer:(d)=>{
+    clearInterval(tmr); let s=+d.s; const set=()=>{ const e=document.getElementById('tm-'+d.i); if(e) e.textContent = s>0 ? s : '✓'; };
+    tmr=setInterval(()=>{ s--; set(); if(s<=0){ clearInterval(tmr); toast('סט הסתיים, כל הכבוד'); try{ navigator.vibrate && navigator.vibrate(250); }catch(e){} } },1000); return 0;
+  },
+  wfinish:()=>{ if(W.checks.flat().some(c=>!c)) return 0; W.fin=true; },
+  wfb:(d)=>{ finishWorkout(d.q); },
+  wclose:()=>{ clearInterval(tmr); W=null; },
+  /* דקה איתי */
+  'ci-open':()=>{ CI = {mode:'day', text:'', saved:false}; renderSheet(); return 0; },
+  'ci-close':()=>{ stopDict(); CI=null; $('#sheet').classList.remove('show'); },
+  'ci-mic':async()=>{
+    try{ if(dictOn){ await dict.stop(); } else { dict.start().catch(e=>{ if(e && e.code==='not_granted') toast('אפשר להקליד, או להכתיב מהמקלדת של הטלפון'); }); } }catch(e){ toast('אפשר להקליד, או להכתיב מהמקלדת של הטלפון'); }
+    return 0;
+  },
+  'ci-save':()=>{
+    const t = ciText().trim(); if(!t){ toast('אפשר לכתוב גם משפט אחד'); return 0; }
+    stopDict(); const e = dayEntry(dk());
+    const stamp = new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'}) + ': ' + t;
+    e.free = (e.free ? e.free + '\n\n' : '') + stamp;
+    CI.saved = true; save(true); renderSheet(); return 0;
+  },
+  'ci-openj':()=>{ stopDict(); CI=null; $('#sheet').classList.remove('show'); jdate=dk(); wmode='write'; tab='write'; render(); window.scrollTo(0,0);
+    const f = document.getElementById('free'); if(f){ f.scrollIntoView({block:'center'}); } return 0; }
+};
+document.addEventListener('click', async ev => {
+  const b = ev.target.closest('[data-a]'); if(!b || b.disabled) return;
+  const f = A[b.dataset.a]; if(!f) return;
+  const r = await f(b.dataset);
+  if(r === 0) return;
+  save(); render();
+});
+document.addEventListener('change', ev => { if(ev.target.id==='e-date' && ev.target.value){ moneyDate = ev.target.value; render(); } });
+document.addEventListener('keydown', ev => {
+  if(ev.key!=='Enter' || ev.target.tagName!=='INPUT' || ev.target.type!=='text' || ev.target.dataset.j || ev.target.dataset.nokey) return;
+  const btn = ev.target.parentElement.querySelector('[data-a]'); if(btn) btn.click();
+});
+document.addEventListener('input', ev => {
+  const t = ev.target;
+  if(t.id==='cit'){ if(CI) CI.text = t.value; return; }
+  if(t.id==='e-amt'){ moneyAmt = t.value; return; }
+  if(t.id==='e-note'){ moneyNote = t.value; return; }
+  const j = t.dataset && t.dataset.j; if(!j) return;
+  const e = dayEntry(jdate);
+  if(j==='free') e.free = t.value;
+  else {
+    const [k,i] = j.split('.'), ix = +i;
+    while(e[k].length < ix) e[k].push('');
+    e[k][ix] = t.value;
+    const wrap = t.closest('.jin');
+    if(wrap && !wrap.nextElementSibling && t.value.trim() && ix < 14){
+      const nw = wrap.cloneNode(true), ni = nw.querySelector('input'); ni.value = ''; ni.dataset.j = k+'.'+(ix+1); wrap.after(nw);
+    }
+  }
+  save();
+});
+
+store.ls = lsTest();
+render();
+if(SHOW_LETTER && !S.seenLetter) showLetter();
+(async()=>{
+  try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+  try{
+    const r = await idbGet();
+    if(r){ const o = JSON.parse(r); store.idb = true; if((o._ts||0) > (S._ts||0)){ S = merge(o); try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} render(); } }
+    else { store.idb = true; if(S._ts) idbPut(JSON.stringify(S)).catch(()=>{}); }
+  }catch(e){ store.idb = false; }
+  paintStatus();
+  if(store.ls===false && store.idb===false) render();
+})();
+</script>
+</body>
+</html>
+
